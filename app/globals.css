@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties ──────────────────────────────────────────────── */
+:root {
+  --brand-navy: #1B2A44;
+  --brand-navy-deep: #162238;
+  --brand-orange: #F27405;
+  --brand-orange-soft: #E66A00;
+  --brand-gray: #E6E6E6;
+  --brand-gray-muted: #CFCFCF;
+  --brand-green: #7BBF2A;
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--brand-gray);
+  color: var(--brand-navy);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: #d9d9d9; }
+::-webkit-scrollbar-thumb { background: var(--brand-orange); border-radius: 3px; }
+
+/* ─── Reusable Utilities ─────────────────────────────────────────────────── */
+@layer utilities {
+  /* Glassmorphism card */
+  .glass {
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--brand-gray-muted);
+  }
+
+  /* Gradient text — GPU-friendly: only transform+opacity animate */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-navy-deep));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Subtle dot-grid background */
+  .dot-grid {
+    background-image: radial-gradient(rgba(27, 42, 68, 0.12) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  /* Line-grid background */
+  .line-grid {
+    background-image:
+      linear-gradient(rgba(22,34,56,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22,34,56,0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Glow shadows — use sparingly */
+  .glow-indigo { box-shadow: 0 0 28px rgba(99, 102, 241, 0.28); }
+  .glow-violet { box-shadow: 0 0 28px rgba(139, 92, 246, 0.28); }
+  .glow-cyan   { box-shadow: 0 0 28px rgba(6, 182, 212, 0.25); }
+
+  /* Section spacing */
+  .section { @apply py-20 md:py-28; }
+  .container-pad { @apply px-4 sm:px-6 lg:px-8; }
+}
+
+/* ─── CSS-only background orb animation ─────────────────────────────────── */
+/* These run on the compositor thread (transform only) → zero jank */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ─── Animated gradient background (used in hero) ────────────────────────── */
+.animated-gradient {
+  background: linear-gradient(270deg, #1B2A44, #162238, #1B2A44, #162238);
+  background-size: 400% 400%;
+  animation: gradient-shift 12s ease infinite;
+}
+
+.hero-fade-mask {
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+.hero-shape {
+  position: absolute;
+  border-radius: 9999px;
+  border: 1px solid rgba(242, 116, 5, 0.25);
+  background: radial-gradient(circle at 30% 30%, rgba(242, 116, 5, 0.25), rgba(242, 116, 5, 0.08));
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cta-glow {
+  position: relative;
+}
+
+.cta-glow::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 14px;
+  background: radial-gradient(circle, rgba(242, 116, 5, 0.35) 0%, rgba(242, 116, 5, 0) 70%);
+  z-index: -1;
+  animation: pulse-glow-soft 2.6s ease-in-out infinite;
+}
+
+/* ─── Skeleton loader ─────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes loading-sweep {
+  0% { transform: translateX(-140%); }
+  100% { transform: translateX(360%); }
+}
+
+.animate-loading-sweep {
+  animation: loading-sweep 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-soft {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.04); }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+/* ─── Focus visible ring ─────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
+}
+
+/* ─── Form inputs ────────────────────────────────────────────────────────── */
+.input-field {
+  @apply w-full bg-white border rounded-xl px-4 py-3 text-[color:var(--brand-navy)]
+         placeholder:text-slate-500 transition-all duration-200
+         focus:outline-none;
+  border-color: var(--brand-gray-muted);
+}
+
+.input-field:focus {
+  border-color: var(--brand-orange);
+  box-shadow: 0 0 0 3px rgba(242, 116, 5, 0.18);
+}
+
+.field-wrap {
+  position: relative;
+}
+
+.field-label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 0.86rem;
+  color: #6b7280;
+  transition: transform 0.18s ease, color 0.18s ease;
+  transform-origin: left top;
+  pointer-events: none;
+  background: #fff;
+  padding: 0 4px;
+}
+
+.input-floating {
+  padding-top: 1.15rem;
+}
+
+.input-floating:focus + .field-label,
+.input-floating:not(:placeholder-shown) + .field-label {
+  transform: translateY(-16px) scale(0.86);
+  color: var(--brand-orange);
+}
+
+/* ─── Button base ────────────────────────────────────────────────────────── */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl
+         transition-all duration-200 select-none focus-visible:outline-none
+         focus-visible:ring-2 focus-visible:ring-offset-2
+         disabled:opacity-50 disabled:cursor-not-allowed;
+  color: #ffffff;
+}
+
+.btn-primary {
+  @apply btn px-6 py-3 active:scale-[0.97];
+  background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-soft));
+  box-shadow: 0 10px 20px rgba(22, 34, 56, 0.16);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #f07a14, var(--brand-orange-soft));
+  transform: translateY(-1px) scale(1.02);
+}
+
+.btn-ghost {
+  @apply btn px-6 py-3 active:scale-[0.97];
+  background: #ffffff;
+  color: var(--brand-navy);
+  border: 1px solid var(--brand-gray-muted);
+}
+
+.btn-ghost:hover {
+  background: #fafafa;
+  border-color: var(--brand-navy);
+}
+
+/* ─── Prose overrides ────────────────────────────────────────────────────── */
+p { line-height: 1.75; }
+
+/* ─── Page transition wrapper ───────────────────────────────────────────── */
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Brand utility helpers for existing components */
+.text-brand-success { color: var(--brand-green); }
+
+/* Keep existing pages readable after moving to light theme */
+.text-white { color: var(--brand-navy) !important; }
+.text-slate-200, .text-slate-300, .text-slate-400, .text-slate-500 { color: #445066 !important; }
