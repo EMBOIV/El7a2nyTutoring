@@ -92,7 +92,7 @@ body {
   -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
-
+ 
 .hero-shape {
   position: absolute;
   border-radius: 9999px; 
