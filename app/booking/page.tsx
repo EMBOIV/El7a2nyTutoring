@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { subjects } from '@/lib/subjects';
 import { stepSlide } from '@/lib/animations';
+import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
 type SessionOption = 'June / July' | 'October / November' | 'January';
@@ -11,6 +12,11 @@ type SessionOption = 'June / July' | 'October / November' | 'January';
 interface BookingState {
   subject: string;
   session: SessionOption | '';
+  name: string;
+  email: string;
+}
+
+interface UserSession {
   name: string;
   email: string;
 }
@@ -54,6 +60,7 @@ export default function BookingPage() {
   const [success, setSuccess] = useState(false);
   const [apiError, setApiError] = useState('');
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [loggedInUser, setLoggedInUser] = useState<UserSession | null>(null);
 
   const [booking, setBooking] = useState<BookingState>({
     subject: '',
@@ -62,12 +69,31 @@ export default function BookingPage() {
     email: '',
   });
 
+  // Read auth session on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('el7a2ny_session');
+      if (raw) {
+        const user = JSON.parse(raw) as UserSession;
+        if (user?.name && user?.email) {
+          setLoggedInUser(user);
+          setBooking(prev => ({ ...prev, name: user.name, email: user.email }));
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   const progressScale = useMemo(() => {
+    if (loggedInUser) {
+      if (step === 1) return 0;
+      if (step === 2) return 0.5;
+      return 1;
+    }
     if (step === 1) return 0;
     if (step === 2) return 0.33;
     if (step === 3) return 0.66;
     return 1;
-  }, [step]);
+  }, [step, loggedInUser]);
 
   const resetAll = () => {
     setStep(1);
@@ -75,7 +101,11 @@ export default function BookingPage() {
     setSuccess(false);
     setApiError('');
     setErrors({});
-    setBooking({ subject: '', session: '', name: '', email: '' });
+    if (loggedInUser) {
+      setBooking({ subject: '', session: '', name: loggedInUser.name, email: loggedInUser.email });
+    } else {
+      setBooking({ subject: '', session: '', name: '', email: '' });
+    }
   };
 
   const validateInfo = () => {
@@ -92,7 +122,8 @@ export default function BookingPage() {
   const submitBooking = async () => {
     setApiError('');
 
-    if (!booking.subject || !booking.session || !validateInfo()) {
+    const infoValid = loggedInUser ? true : validateInfo();
+    if (!booking.subject || !booking.session || !infoValid) {
       if (!booking.subject) setStep(1);
       else if (!booking.session) setStep(2);
       else setStep(3);
@@ -189,6 +220,20 @@ export default function BookingPage() {
       <section className="pb-24">
         <div className="max-w-4xl mx-auto container-pad">
           <div className="glass rounded-2xl p-5 md:p-8 border border-brand-grayMuted shadow-sm">
+            {/* Logged-in user banner */}
+            {loggedInUser && (
+              <div className="mb-6 flex items-center justify-between rounded-xl bg-brand-green/10 border border-brand-green/30 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-brand-green text-lg">✓</span>
+                  <span className="text-sm text-brand-navy">
+                    Booking as <strong>{loggedInUser.name}</strong> ({loggedInUser.email})
+                  </span>
+                </div>
+                <Link href="/auth" className="text-xs text-slate-500 hover:text-brand-orange underline">
+                  Not you?
+                </Link>
+              </div>
+            )}
             <div className="flex items-center gap-0 mb-6">
               {STEP_LABELS.map((label, index) => {
                 const current = (index + 1) as Step;
@@ -282,7 +327,15 @@ export default function BookingPage() {
 
                   <div className="mt-6 flex gap-3">
                     <button onClick={() => setStep(1)} className="btn-ghost px-6 py-3 text-sm">Back</button>
-                    <button onClick={() => booking.session && setStep(3)} disabled={!booking.session} className="btn-primary px-6 py-3 text-sm disabled:opacity-50">
+                    <button
+                      onClick={() => {
+                        if (!booking.session) return;
+                        // If logged in, skip step 3 (info already filled)
+                        setStep(loggedInUser ? 4 : 3);
+                      }}
+                      disabled={!booking.session}
+                      className="btn-primary px-6 py-3 text-sm disabled:opacity-50"
+                    >
                       Continue
                     </button>
                   </div>

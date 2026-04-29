@@ -9,7 +9,7 @@ type Tab = 'login' | 'signup';
 interface LoginForm  { email: string; password: string }
 interface SignupForm { name: string; email: string; password: string; confirm: string }
 
-function LoginFormComp({ onSuccess }: { onSuccess: () => void }) {
+function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string) => void }) {
   const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
   const [errors, setErrors] = useState<Partial<LoginForm>>({});
   const [loading, setLoading] = useState(false);
@@ -26,9 +26,18 @@ function LoginFormComp({ onSuccess }: { onSuccess: () => void }) {
     ev.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 800)); // simulate API
+    // Check if user exists in localStorage
+    const stored = localStorage.getItem('el7a2ny_users');
+    const users: Array<{ name: string; email: string; password: string }> = stored ? JSON.parse(stored) : [];
+    const found = users.find(u => u.email === form.email && u.password === form.password);
+    await new Promise(r => setTimeout(r, 600));
     setLoading(false);
-    onSuccess();
+    if (!found) {
+      setErrors({ password: 'Invalid email or password' });
+      return;
+    }
+    localStorage.setItem('el7a2ny_session', JSON.stringify({ name: found.name, email: found.email }));
+    onSuccess(found.name, found.email);
   };
 
   return (
@@ -55,7 +64,7 @@ function LoginFormComp({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-function SignupFormComp({ onSuccess }: { onSuccess: () => void }) {
+function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string) => void }) {
   const [form, setForm] = useState<SignupForm>({ name: '', email: '', password: '', confirm: '' });
   const [errors, setErrors] = useState<Partial<SignupForm>>({});
   const [loading, setLoading] = useState(false);
@@ -74,9 +83,27 @@ function SignupFormComp({ onSuccess }: { onSuccess: () => void }) {
     ev.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 900));
+    // Save user to localStorage
+    const stored = localStorage.getItem('el7a2ny_users');
+    const users: Array<{ name: string; email: string; password: string }> = stored ? JSON.parse(stored) : [];
+    const exists = users.find(u => u.email === form.email);
+    if (exists) {
+      setErrors({ email: 'An account with this email already exists' });
+      setLoading(false);
+      return;
+    }
+    users.push({ name: form.name, email: form.email, password: form.password });
+    localStorage.setItem('el7a2ny_users', JSON.stringify(users));
+    localStorage.setItem('el7a2ny_session', JSON.stringify({ name: form.name, email: form.email }));
+    // Send welcome email (fire and forget)
+    fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: form.name, email: form.email }),
+    }).catch(() => {});
+    await new Promise(r => setTimeout(r, 600));
     setLoading(false);
-    onSuccess();
+    onSuccess(form.name, form.email);
   };
 
   return (
@@ -110,9 +137,11 @@ function SignupFormComp({ onSuccess }: { onSuccess: () => void }) {
 
 export default function AuthPage() {
   const [tab, setTab] = useState<Tab>('login');
-  const [success, setSuccess] = useState(false);
+  const [successUser, setSuccessUser] = useState<{ name: string; email: string } | null>(null);
 
-  if (success) {
+  const handleSuccess = (name: string, email: string) => setSuccessUser({ name, email });
+
+  if (successUser) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-[70px]">
         <motion.div
@@ -122,9 +151,13 @@ export default function AuthPage() {
         >
           <div className="text-5xl mb-5">🎓</div>
           <h2 className="text-white font-bold text-2xl mb-3">
-            {tab === 'login' ? 'Welcome back!' : 'Account created!'}
+            {tab === 'login' ? `Welcome back, ${successUser.name}!` : 'Account created!'}
           </h2>
-          <p className="text-slate-400 mb-8">You&apos;re now signed in to El7a2ny Tutoring.</p>
+          <p className="text-slate-400 mb-2">You&apos;re now signed in to El7a2ny Tutoring.</p>
+          {tab === 'signup' && (
+            <p className="text-slate-500 text-sm mb-6">A welcome email has been sent to <strong className="text-slate-300">{successUser.email}</strong></p>
+          )}
+          {tab === 'login' && <div className="mb-8" />}
           <Link href="/dashboard" className="btn-primary px-8 py-3 text-sm inline-flex">Go to Dashboard</Link>
         </motion.div>
       </div>
@@ -197,8 +230,8 @@ export default function AuthPage() {
               </h1>
 
               {tab === 'login'
-                ? <LoginFormComp  onSuccess={() => setSuccess(true)} />
-                : <SignupFormComp onSuccess={() => setSuccess(true)} />
+                ? <LoginFormComp  onSuccess={handleSuccess} />
+                : <SignupFormComp onSuccess={handleSuccess} />
               }
 
               <p className="text-center text-slate-500 text-xs mt-5">

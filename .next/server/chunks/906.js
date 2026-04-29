@@ -1,0 +1,1 @@
+"use strict";exports.id=906,exports.ids=[906],exports.modules={92906:(t,e,s)=>{s.r(e),s.d(e,{default:()=>o});let o=(0,s(68570).createProxy)(String.raw`E:\El7a2nyTutoring\components\home\Testimonials.tsx#default`)}};
