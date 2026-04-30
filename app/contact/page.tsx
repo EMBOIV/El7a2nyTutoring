@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 interface FormData {
   name: string;
   email: string;
+  phone: string;
   subject: string;
   message: string;
 }
@@ -51,7 +52,7 @@ const CONTACT_INFO = [
 ];
 
 export default function ContactPage() {
-  const [form, setForm] = useState<FormData>({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm] = useState<FormData>({ name: '', email: '', phone: '', subject: '', message: '' });
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [state, setState] = useState<FormState>({ loading: false, success: false, error: '' });
 
@@ -60,6 +61,8 @@ export default function ContactPage() {
     if (!form.name.trim())                    e.name    = 'Name is required';
     if (!form.email.trim())                   e.email   = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email  = 'Enter a valid email';
+    if (!form.phone.trim())                   e.phone   = 'WhatsApp number is required';
+    else if (!/^\+[1-9]\d{7,14}$/.test(form.phone.replace(/[\s()-]/g, '').trim())) e.phone = 'Use country code format, e.g. +201010294098';
     if (!form.subject.trim())                 e.subject = 'Subject is required';
     if (!form.message.trim())                 e.message = 'Message is required';
     else if (form.message.length < 20)        e.message = 'Message must be at least 20 characters';
@@ -79,7 +82,7 @@ export default function ContactPage() {
       });
       if (!res.ok) throw new Error('Failed to send');
       setState({ loading: false, success: true, error: '' });
-      setForm({ name: '', email: '', subject: '', message: '' });
+      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch {
       setState({ loading: false, success: false, error: 'Something went wrong. Please try again.' });
     }
@@ -209,6 +212,17 @@ export default function ContactPage() {
                         />
                         {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[#334155] text-sm font-medium block mb-1.5">WhatsApp Number with Country Code *</label>
+                      <input
+                        type="tel"
+                        placeholder="+201010294098"
+                        className={`input-field ${errors.phone ? 'border-red-500/60' : ''}`}
+                        {...field('phone')}
+                      />
+                      {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
                     </div>
 
                     {/* Subject */}

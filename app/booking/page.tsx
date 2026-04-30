@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { subjects } from '@/lib/subjects';
 import { stepSlide } from '@/lib/animations';
 import { addSession } from '@/lib/auth';
+import { isValidPhone, normalizePhone } from '@/lib/auth';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -23,11 +24,13 @@ interface SubjectSession {
 interface ContactInfo {
   name: string;
   email: string;
+  phone: string;
 }
 
 interface UserSession {
   name: string;
   email: string;
+  phone?: string;
 }
 
 const STEP_LABELS = ['Subjects', 'Sessions', 'Your Info', 'Confirm'];
@@ -46,7 +49,7 @@ function LabeledInput({
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-[#64748B] mb-1.5">{label}</label>
       <input id={id} type={type} value={value} onChange={e => onChange(e.target.value)}
-        placeholder={type === 'email' ? 'your@email.com' : 'Your full name'}
+        placeholder={type === 'email' ? 'your@email.com' : type === 'tel' ? '+201010294098' : 'Your full name'}
         className={`input-field ${hasError ? 'border-red-500/60 focus:border-red-500/80' : ''}`} />
     </div>
   );
@@ -59,12 +62,12 @@ export default function BookingPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [apiError, setApiError] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string }>({});
   const [loggedInUser, setLoggedInUser] = useState<UserSession | null>(null);
 
   // Multi-subject: array of { subject, session, emoji }
   const [selections, setSelections] = useState<SubjectSession[]>([]);
-  const [info, setInfo] = useState<ContactInfo>({ name: '', email: '' });
+  const [info, setInfo] = useState<ContactInfo>({ name: '', email: '', phone: '' });
 
   // Read auth session on mount
   useEffect(() => {
@@ -74,11 +77,13 @@ export default function BookingPage() {
         const user = JSON.parse(raw) as UserSession;
         if (user?.name && user?.email) {
           setLoggedInUser(user);
-          setInfo({ name: user.name, email: user.email });
+          setInfo({ name: user.name, email: user.email, phone: user.phone ?? '' });
         }
       }
     } catch { /* ignore */ }
   }, []);
+
+  const needsContactStep = !loggedInUser || !loggedInUser.phone;
 
   useEffect(() => {
     const preSubject = searchParams.get('subject');
@@ -98,7 +103,7 @@ export default function BookingPage() {
   }, [searchParams]);
 
   const progressScale = useMemo(() => {
-    if (loggedInUser) {
+    if (!needsContactStep) {
       if (step === 1) return 0;
       if (step === 2) return 0.5;
       return 1;
@@ -107,7 +112,7 @@ export default function BookingPage() {
     if (step === 2) return 0.33;
     if (step === 3) return 0.66;
     return 1;
-  }, [step, loggedInUser]);
+  }, [step, needsContactStep]);
 
   const toggleSubject = (name: string, emoji: string) => {
     setSelections(prev => {
@@ -128,10 +133,12 @@ export default function BookingPage() {
   const allSessionsFilled = selections.length > 0 && selections.every(s => s.session !== '' && s.examSession !== '');
 
   const validateInfo = () => {
-    const e: { name?: string; email?: string } = {};
+    const e: { name?: string; email?: string; phone?: string } = {};
     if (!info.name.trim()) e.name = 'Full name is required';
     if (!info.email.trim()) e.email = 'Email is required';
     else if (!EMAIL_RE.test(info.email)) e.email = 'Please enter a valid email address';
+    if (!info.phone.trim()) e.phone = 'WhatsApp number is required';
+    else if (!isValidPhone(info.phone)) e.phone = 'Use country code format, e.g. +201010294098';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -143,23 +150,24 @@ export default function BookingPage() {
     setApiError('');
     setErrors({});
     setSelections([]);
-    setInfo(loggedInUser ? { name: loggedInUser.name, email: loggedInUser.email } : { name: '', email: '' });
+    setInfo(loggedInUser ? { name: loggedInUser.name, email: loggedInUser.email, phone: loggedInUser.phone ?? '' } : { name: '', email: '', phone: '' });
   };
 
   const submitBooking = async () => {
     setApiError('');
-    const infoValid = loggedInUser ? true : validateInfo();
+    const infoValid = needsContactStep ? validateInfo() : true;
     if (!infoValid) { setStep(3); return; }
 
     const name = loggedInUser?.name ?? info.name;
     const email = loggedInUser?.email ?? info.email;
+    const phone = normalizePhone(loggedInUser?.phone ?? info.phone);
 
     setLoading(true);
     try {
       const response = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subjects: selections.map(s => ({ subject: s.subject, session: s.session, examSession: s.examSession })) }),
+        body: JSON.stringify({ name, email, phone, subjects: selections.map(s => ({ subject: s.subject, session: s.session, examSession: s.examSession })) }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Booking request failed');
@@ -192,6 +200,7 @@ export default function BookingPage() {
   if (success) {
     const name = loggedInUser?.name ?? info.name;
     const email = loggedInUser?.email ?? info.email;
+    const phone = loggedInUser?.phone ?? info.phone;
     return (
       <div className="pt-[70px] min-h-screen flex items-center justify-center">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg w-full container-pad">
@@ -214,6 +223,10 @@ export default function BookingPage() {
               <div className="flex justify-between py-1 border-b border-brand-grayMuted">
                 <span className="text-[#334155]">Email</span>
                 <span className="text-brand-navy font-semibold">{email}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-brand-grayMuted">
+                <span className="text-[#334155]">WhatsApp</span>
+                <span className="text-brand-navy font-semibold">{phone}</span>
               </div>
               {selections.map((s, i) => (
                 <div key={s.subject} className={`py-1 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
@@ -261,7 +274,7 @@ export default function BookingPage() {
               <div className="mb-6 flex items-center justify-between rounded-xl bg-brand-green/10 border border-brand-green/30 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="text-brand-green text-lg">✓</span>
-                  <span className="text-sm text-brand-navy">Booking as <strong>{loggedInUser.name}</strong> ({loggedInUser.email})</span>
+                  <span className="text-sm text-brand-navy">Booking as <strong>{loggedInUser.name}</strong> ({loggedInUser.email}{loggedInUser.phone ? ` · ${loggedInUser.phone}` : ''})</span>
                 </div>
                 <Link href="/auth" className="text-xs text-[#64748B] hover:text-brand-orange underline">Not you?</Link>
               </div>
@@ -272,7 +285,7 @@ export default function BookingPage() {
               {STEP_LABELS.map((label, index) => {
                 const current = (index + 1) as Step;
                 // Hide step 3 indicator when logged in
-                if (loggedInUser && current === 3) return null;
+                if (!needsContactStep && current === 3) return null;
                 const active = step === current;
                 const done = step > current;
                 return (
@@ -412,7 +425,7 @@ export default function BookingPage() {
                   <div className="mt-6 flex gap-3">
                     <button onClick={() => setStep(1)} className="btn-ghost px-6 py-3 text-sm">Back</button>
                     <button
-                      onClick={() => allSessionsFilled && setStep(loggedInUser ? 4 : 3)}
+                      onClick={() => allSessionsFilled && setStep(needsContactStep ? 3 : 4)}
                       disabled={!allSessionsFilled}
                       className="btn-primary px-6 py-3 text-sm disabled:opacity-40"
                     >
@@ -423,7 +436,7 @@ export default function BookingPage() {
               )}
 
               {/* ── STEP 3: Contact info (skip if logged in) ── */}
-              {step === 3 && !loggedInUser && (
+              {step === 3 && needsContactStep && (
                 <motion.div key="info-step" {...stepSlide}>
                   <h2 className="text-brand-navy font-bold text-xl mb-4">Step 3: Enter Your Details</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -436,6 +449,11 @@ export default function BookingPage() {
                       <LabeledInput id="email" type="email" label="Email Address *" value={info.email} hasError={!!errors.email}
                         onChange={v => { setInfo(p => ({ ...p, email: v })); if (errors.email) setErrors(p => ({ ...p, email: undefined })); }} />
                       {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
+                    </div>
+                    <div className="sm:col-span-2">
+                      <LabeledInput id="phone" type="tel" label="WhatsApp Number with Country Code *" value={info.phone} hasError={!!errors.phone}
+                        onChange={v => { setInfo(p => ({ ...p, phone: v })); if (errors.phone) setErrors(p => ({ ...p, phone: undefined })); }} />
+                      {errors.phone && <p className="text-red-400 text-xs mt-1.5">{errors.phone}</p>}
                     </div>
                   </div>
                   <div className="mt-6 flex gap-3">
@@ -458,6 +476,10 @@ export default function BookingPage() {
                       <span className="text-[#334155]">Email</span>
                       <span className="text-brand-navy font-semibold">{loggedInUser?.email ?? info.email}</span>
                     </div>
+                    <div className="flex justify-between py-2 border-b border-brand-grayMuted">
+                      <span className="text-[#334155]">WhatsApp</span>
+                      <span className="text-brand-navy font-semibold">{loggedInUser?.phone ?? info.phone}</span>
+                    </div>
                     {selections.map((s, i) => (
                       <div key={s.subject} className={`py-2 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
                         <div className="flex justify-between">
@@ -474,7 +496,7 @@ export default function BookingPage() {
                   {apiError && <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{apiError}</p>}
 
                   <div className="flex gap-3">
-                    <button onClick={() => setStep(loggedInUser ? 2 : 3)} className="btn-ghost px-6 py-3 text-sm">Back</button>
+                    <button onClick={() => setStep(needsContactStep ? 3 : 2)} className="btn-ghost px-6 py-3 text-sm">Back</button>
                     <button onClick={submitBooking} disabled={loading} className="btn-primary px-6 py-3 text-sm">
                       {loading ? 'Sending...' : `Confirm ${selections.length} Booking${selections.length > 1 ? 's' : ''}`}
                     </button>

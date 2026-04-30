@@ -10,13 +10,19 @@ interface SubjectEntry {
 interface BookingPayload {
   name?: string;
   email?: string;
+  phone?: string;
   subjects?: SubjectEntry[];
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+[1-9]\d{7,14}$/;
 const ADMIN_EMAIL = 'ali.a.embaby@hotmail.com';
 const ADMIN_PHONE = '01010294098';
 const FROM = 'El7a2ny Tutoring <onboarding@resend.dev>';
+
+function normalizePhone(value: string): string {
+  return value.replace(/[\s()-]/g, '').trim();
+}
 
 function buildSubjectsTable(entries: SubjectEntry[]): string {
   const rows = entries.map((e, i) => `
@@ -43,18 +49,21 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as BookingPayload;
     const name = body.name?.trim();
     const email = body.email?.trim();
+    const phone = normalizePhone(body.phone ?? '');
     const entries = body.subjects;
 
     if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     if (!EMAIL_RE.test(email)) return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+    if (!phone) return NextResponse.json({ error: 'WhatsApp phone number is required' }, { status: 400 });
+    if (!PHONE_RE.test(phone)) return NextResponse.json({ error: 'Phone must include country code, e.g. +201010294098' }, { status: 400 });
     if (!entries || entries.length === 0) return NextResponse.json({ error: 'At least one subject is required' }, { status: 400 });
     if (entries.some(e => !e.subject || !e.session)) return NextResponse.json({ error: 'Each subject must have a session' }, { status: 400 });
 
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.warn('[BOOKING] RESEND_API_KEY not set — booking logged only');
-      console.log('[BOOKING]', { name, email, subjects: entries });
+      console.log('[BOOKING]', { name, email, phone, subjects: entries });
       return NextResponse.json({ success: true, message: 'Booking request received ✅' });
     }
 
@@ -88,6 +97,7 @@ export async function POST(req: NextRequest) {
           <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
             <tr style="background:#F8F8F8;"><td style="padding:10px 14px;font-weight:600;width:40%;">Student Name</td><td style="padding:10px 14px;">${name}</td></tr>
             <tr><td style="padding:10px 14px;font-weight:600;">Email</td><td style="padding:10px 14px;">${email}</td></tr>
+            <tr style="background:#F8F8F8;"><td style="padding:10px 14px;font-weight:600;">WhatsApp</td><td style="padding:10px 14px;">${phone}</td></tr>
           </table>
           ${buildSubjectsTable(entries)}
         </div>

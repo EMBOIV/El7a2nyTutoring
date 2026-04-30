@@ -3,22 +3,38 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { getRoleForEmail, getUsers, saveUsers, saveSession, getInitials } from '@/lib/auth';
+import {
+  getRoleForEmail,
+  getUsers,
+  saveUsers,
+  saveSession,
+  getInitials,
+  isEmail,
+  isPhone,
+  isValidEmail,
+  isValidPhone,
+  normalizeEmail,
+  normalizePhone,
+} from '@/lib/auth';
 import type { AppUser } from '@/lib/auth';
 
 type Tab = 'login' | 'signup';
 
-interface LoginForm  { email: string; password: string }
-interface SignupForm { name: string; email: string; password: string; confirm: string }
+interface LoginForm  { identifier: string; password: string }
+interface SignupForm { name: string; email: string; phone: string; password: string; confirm: string }
 
 function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string) => void }) {
-  const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
+  const [form, setForm] = useState<LoginForm>({ identifier: '', password: '' });
   const [errors, setErrors] = useState<Partial<LoginForm>>({});
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const e: Partial<LoginForm> = {};
-    if (!form.email)    e.email    = 'Email required';
+    if (!form.identifier) {
+      e.identifier = 'Email or phone required';
+    } else if (!isEmail(form.identifier) && !isPhone(form.identifier)) {
+      e.identifier = 'Enter a valid email or WhatsApp number with country code (e.g. +201010294098)';
+    }
     if (!form.password) e.password = 'Password required';
     setErrors(e);
     return !Object.keys(e).length;
@@ -28,26 +44,29 @@ function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string)
     ev.preventDefault();
     if (!validate()) return;
     setLoading(true);
+    const identifier = form.identifier.trim();
+    const byEmail = isEmail(identifier);
+    const normalizedIdentifier = byEmail ? normalizeEmail(identifier) : normalizePhone(identifier);
     const users = getUsers();
-    const found = users.find(u => u.email === form.email && u.password === form.password);
+    const found = users.find(u => (byEmail ? u.email === normalizedIdentifier : normalizePhone(u.phone) === normalizedIdentifier) && u.password === form.password);
     await new Promise(r => setTimeout(r, 600));
     setLoading(false);
     if (!found) {
-      setErrors({ password: 'Invalid email or password' });
+      setErrors({ password: 'Invalid email/phone or password' });
       return;
     }
     const role = getRoleForEmail(found.email);
-    saveSession({ name: found.name, email: found.email, role });
+    saveSession({ name: found.name, email: found.email, phone: found.phone, role });
     onSuccess(found.name, found.email);
   };
 
   return (
     <form onSubmit={submit} noValidate className="space-y-5">
       <div>
-        <label className="text-[#334155] text-sm font-medium block mb-1.5">Email</label>
-        <input type="email" placeholder="your@email.com" className={`input-field ${errors.email ? 'border-red-500/60' : ''}`}
-          value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-        {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+        <label className="text-[#334155] text-sm font-medium block mb-1.5">Email or WhatsApp Number</label>
+        <input type="text" placeholder="your@email.com or +201010294098" className={`input-field ${errors.identifier ? 'border-red-500/60' : ''}`}
+          value={form.identifier} onChange={e => setForm(f => ({ ...f, identifier: e.target.value }))} />
+        {errors.identifier && <p className="text-red-400 text-xs mt-1">{errors.identifier}</p>}
       </div>
       <div>
         <label className="text-[#334155] text-sm font-medium block mb-1.5">Password</label>
@@ -66,7 +85,7 @@ function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string)
 }
 
 function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string) => void }) {
-  const [form, setForm] = useState<SignupForm>({ name: '', email: '', password: '', confirm: '' });
+  const [form, setForm] = useState<SignupForm>({ name: '', email: '', phone: '', password: '', confirm: '' });
   const [errors, setErrors] = useState<Partial<SignupForm>>({});
   const [loading, setLoading] = useState(false);
 
@@ -74,6 +93,9 @@ function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string
     const e: Partial<SignupForm> = {};
     if (!form.name) e.name = 'Name required';
     if (!form.email) e.email = 'Email required';
+    else if (!isValidEmail(form.email)) e.email = 'Enter a valid email address';
+    if (!form.phone) e.phone = 'WhatsApp number required';
+    else if (!isValidPhone(form.phone)) e.phone = 'Use country code format, e.g. +201010294098';
     if (form.password.length < 8) e.password = 'At least 8 characters';
     if (form.confirm !== form.password) e.confirm = 'Passwords do not match';
     setErrors(e);
@@ -85,21 +107,29 @@ function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string
     if (!validate()) return;
     setLoading(true);
     const users = getUsers();
-    const exists = users.find(u => u.email === form.email);
+    const normalizedEmail = normalizeEmail(form.email);
+    const normalizedPhone = normalizePhone(form.phone);
+    const exists = users.find(u => u.email === normalizedEmail || normalizePhone(u.phone) === normalizedPhone);
     if (exists) {
-      setErrors({ email: 'An account with this email already exists' });
+      setErrors({ email: 'An account with this email or phone already exists' });
       setLoading(false);
       return;
     }
-    const role = getRoleForEmail(form.email);
-    const newUser: AppUser = { name: form.name, email: form.email, password: form.password, role };
+    const role = getRoleForEmail(normalizedEmail);
+    const newUser: AppUser = {
+      name: form.name.trim(),
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      password: form.password,
+      role,
+    };
     saveUsers([...users, newUser]);
-    saveSession({ name: form.name, email: form.email, role });
+    saveSession({ name: form.name.trim(), email: normalizedEmail, phone: normalizedPhone, role });
     // Send welcome email (fire and forget)
     fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: form.name, email: form.email }),
+      body: JSON.stringify({ name: form.name.trim(), email: normalizedEmail, phone: normalizedPhone }),
     }).catch(() => {});
     await new Promise(r => setTimeout(r, 600));
     setLoading(false);
@@ -111,6 +141,7 @@ function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string
       {[
         { key: 'name',     label: 'Full Name',        type: 'text',     ph: 'Your name' },
         { key: 'email',    label: 'Email',             type: 'email',    ph: 'your@email.com' },
+        { key: 'phone',    label: 'WhatsApp Number',   type: 'tel',      ph: '+201010294098' },
         { key: 'password', label: 'Password',          type: 'password', ph: '••••••••' },
         { key: 'confirm',  label: 'Confirm Password',  type: 'password', ph: '••••••••' },
       ].map(f => (

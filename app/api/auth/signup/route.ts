@@ -4,19 +4,26 @@ import { Resend } from 'resend';
 interface SignupPayload {
   name?: string;
   email?: string;
+  phone?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+[1-9]\d{7,14}$/;
 const FROM = 'El7a2ny Tutoring <onboarding@resend.dev>';
+
+function normalizePhone(value: string): string {
+  return value.replace(/[\s()-]/g, '').trim();
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as SignupPayload;
     const name = body.name?.trim();
     const email = body.email?.trim();
+    const phone = normalizePhone(body.phone ?? '');
 
-    if (!name || !email || !EMAIL_RE.test(email)) {
-      return NextResponse.json({ error: 'Name and valid email are required' }, { status: 400 });
+    if (!name || !email || !EMAIL_RE.test(email) || !phone || !PHONE_RE.test(phone)) {
+      return NextResponse.json({ error: 'Name, valid email, and WhatsApp number with country code are required' }, { status: 400 });
     }
 
     const apiKey = process.env.RESEND_API_KEY;

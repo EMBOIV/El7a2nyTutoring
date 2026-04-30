@@ -14,6 +14,7 @@ export type UserRole = 'student' | 'teacher';
 export interface AppSession {
   name: string;
   email: string;
+  phone?: string;
   role: UserRole;
   avatar?: string;
 }
@@ -21,6 +22,7 @@ export interface AppSession {
 export interface AppUser {
   name: string;
   email: string;
+  phone: string;
   password: string;
   role: UserRole;
   avatar?: string;
@@ -61,6 +63,33 @@ export interface ReminderEntry {
 
 export function getRoleForEmail(email: string): UserRole {
   return TEACHER_EMAILS.includes(email.toLowerCase().trim()) ? 'teacher' : 'student';
+}
+
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const PHONE_RE = /^\+[1-9]\d{7,14}$/;
+
+export function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+export function normalizePhone(value: string): string {
+  return value.replace(/[\s()-]/g, '').trim();
+}
+
+export function isValidEmail(value: string): boolean {
+  return EMAIL_RE.test(normalizeEmail(value));
+}
+
+export function isValidPhone(value: string): boolean {
+  return PHONE_RE.test(normalizePhone(value));
+}
+
+export function isEmail(value: string): boolean {
+  return isValidEmail(value);
+}
+
+export function isPhone(value: string): boolean {
+  return isValidPhone(value);
 }
 
   export function getTeacherSubjects(email: string): string[] {
@@ -104,6 +133,8 @@ export function getUsers(): AppUser[] {
     if (!raw) return [];
     return (JSON.parse(raw) as AppUser[]).map(u => ({
       ...u,
+      email: normalizeEmail(u.email),
+      phone: u.phone ? normalizePhone(u.phone) : '',
       role: u.role ?? getRoleForEmail(u.email),
     }));
   } catch { return []; }
