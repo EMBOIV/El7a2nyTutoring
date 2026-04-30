@@ -26,7 +26,7 @@ function Timeline() {
   return (
     <div ref={ref} className="relative max-w-2xl mx-auto">
       {/* Vertical line */}
-      <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-600 via-violet-600 to-transparent" />
+      <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-brand-orange via-brand-orange/50 to-transparent" />
 
       <div className="space-y-8">
         {TIMELINE.map((item, i) => (
@@ -38,9 +38,9 @@ function Timeline() {
             className="pl-14 relative"
           >
             {/* Dot */}
-            <div className="absolute left-3 top-1.5 w-4 h-4 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 border-2 border-dark-bg" />
+            <div className="absolute left-3 top-1.5 w-4 h-4 rounded-full bg-brand-orange border-2 border-[#0F1C30] shadow-[0_0_8px_rgba(242,116,5,0.50)]" />
 
-            <span className="text-indigo-400 text-xs font-semibold uppercase tracking-wider">{item.year}</span>
+            <span className="text-brand-orange text-xs font-semibold uppercase tracking-wider">{item.year}</span>
             <h3 className="text-white font-semibold mt-0.5 mb-1">{item.title}</h3>
             <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
           </motion.div>
@@ -58,7 +58,7 @@ export default function AboutPage() {
     <div className="pt-[70px]">
       {/* Hero */}
       <section className="relative py-24 overflow-hidden">
-        <div className="orb w-[400px] h-[400px] bg-indigo-600/15 animate-float -top-[10%] -right-[5%]" />
+        <div className="orb w-[400px] h-[400px] bg-brand-orange opacity-[0.08] animate-float -top-[10%] -right-[5%]" />
         <div className="line-grid absolute inset-0 opacity-40 pointer-events-none" />
 
         <div ref={heroRef} className="relative z-10 max-w-4xl mx-auto container-pad text-center">
@@ -67,7 +67,7 @@ export default function AboutPage() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Our Story</span>
+            <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Our Story</span>
             <h1 className="text-4xl md:text-6xl font-extrabold text-white mt-3 mb-6">
               Built for IGCSE.<br />
               <span className="gradient-text">Driven by Results.</span>
@@ -88,15 +88,15 @@ export default function AboutPage() {
                 icon: '🎯',
                 title: 'Our Mission',
                 text: 'To make world-class IGCSE tutoring accessible to every motivated student. We combine expert knowledge with personalised teaching to help students unlock their academic potential.',
-                gradient: 'from-indigo-600/20 to-violet-600/20',
-                border: 'border-indigo-500/20',
+                gradient: 'from-brand-orange/15 to-brand-orange/5',
+                border: 'border-brand-orange/20',
               },
               {
                 icon: '🚀',
                 title: 'Our Vision',
                 text: 'To become the leading IGCSE tutoring platform in the MENA region, empowering students to achieve not just good grades, but a genuine love for learning.',
-                gradient: 'from-cyan-600/20 to-blue-600/20',
-                border: 'border-cyan-500/20',
+                gradient: 'from-[#7BBF2A]/15 to-[#7BBF2A]/5',
+                border: 'border-[#7BBF2A]/20',
               },
             ].map(item => (
               <div
@@ -116,7 +116,7 @@ export default function AboutPage() {
       <section className="section">
         <div className="max-w-7xl mx-auto container-pad">
           <div className="text-center mb-14">
-            <span className="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Journey</span>
+            <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Journey</span>
             <h2 className="text-3xl md:text-4xl font-bold text-white mt-2">Our Story So Far</h2>
           </div>
           <Timeline />
@@ -127,7 +127,7 @@ export default function AboutPage() {
       <section className="section bg-dark-surface/40">
         <div className="max-w-7xl mx-auto container-pad">
           <div className="text-center mb-14">
-            <span className="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Team</span>
+            <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Team</span>
             <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-4">Meet Our Tutors</h2>
             <p className="text-slate-400 max-w-xl mx-auto">
               Experts who don&apos;t just know their subjects — they know how to teach them.
@@ -149,7 +149,7 @@ export default function AboutPage() {
                   {member.initials}
                 </div>
                 <h3 className="text-white font-semibold">{member.name}</h3>
-                <p className="text-indigo-400 text-sm mt-1 mb-3">{member.role}</p>
+                <p className="text-brand-orange text-sm mt-1 mb-3">{member.role}</p>
                 <p className="text-slate-400 text-xs leading-relaxed mb-4">{member.bio}</p>
                 <div className="flex flex-wrap gap-1.5 justify-center">
                   {member.subjects.map(s => (

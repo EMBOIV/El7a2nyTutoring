@@ -98,9 +98,9 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="relative py-20 text-center overflow-hidden">
         <div className="line-grid absolute inset-0 opacity-40 pointer-events-none" />
-        <div className="orb w-[300px] h-[300px] bg-cyan-600/15 animate-float -top-[10%] right-[5%]" />
+        <div className="orb w-[300px] h-[300px] bg-brand-orange opacity-[0.07] animate-float -top-[10%] right-[5%]" />
         <div className="relative z-10 max-w-2xl mx-auto container-pad">
-          <span className="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Get in Touch</span>
+          <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Get in Touch</span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mt-3 mb-4">
             We&apos;d Love to <span className="gradient-text">Hear From You</span>
           </h1>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                       href={c.href}
                       className="flex items-start gap-4 group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-indigo-600/15 border border-indigo-500/20 flex items-center justify-center text-indigo-400 flex-shrink-0 group-hover:bg-indigo-600/25 transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-brand-orange flex-shrink-0 group-hover:bg-brand-orange/20 transition-colors">
                         {c.icon}
                       </div>
                       <div>

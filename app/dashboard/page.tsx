@@ -66,7 +66,7 @@ export default function DashboardPage() {
               key={t}
               onClick={() => setActiveTab(t)}
               className={`px-5 py-2 rounded-xl text-sm font-medium capitalize transition-all ${
-                activeTab === t ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                activeTab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#9BAFC8] hover:text-white'
               }`}
             >
               {t}
@@ -92,7 +92,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-slate-200 text-sm font-medium">{session.date}</p>
-                      <p className="text-indigo-400 text-xs">{session.time}</p>
+                      <p className="text-brand-orange text-xs">{session.time}</p>
                     </div>
                   </div>
                 ))}

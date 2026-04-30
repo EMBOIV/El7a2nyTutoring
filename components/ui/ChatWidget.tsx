@@ -61,7 +61,7 @@ export default function ChatWidget() {
         whileTap={{ scale: 0.94 }}
         onClick={() => setOpen(v => !v)}
         aria-label="Open chat assistant"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center shadow-[0_8px_24px_rgba(242,116,5,0.45)] hover:shadow-[0_8px_32px_rgba(242,116,5,0.60)] transition-shadow"
       >
         {open ? (
           <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -85,7 +85,7 @@ export default function ChatWidget() {
             className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 max-h-[420px] glass rounded-2xl overflow-hidden shadow-2xl shadow-black/50 flex flex-col"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 flex items-center gap-3">
+            <div className="bg-gradient-to-r from-brand-orange to-brand-orangeSoft px-4 py-3 flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-bold">E</div>
               <div>
                 <p className="text-white font-semibold text-sm">El7a2ny Assistant</p>
@@ -101,7 +101,7 @@ export default function ChatWidget() {
                   <div
                     className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-indigo-600 text-white rounded-br-sm'
+                        ? 'bg-brand-orange text-white rounded-br-sm'
                         : 'bg-white/[0.07] text-slate-200 rounded-bl-sm'
                     }`}
                   >
@@ -120,14 +120,14 @@ export default function ChatWidget() {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && send()}
                 placeholder="Type a message…"
-                className="flex-1 bg-white/[0.06] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60"
+                className="flex-1 bg-white/[0.06] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-[#6B829E] focus:outline-none focus:border-brand-orange/50"
               />
               <button
                 onClick={send}
                 disabled={!input.trim()}
                 aria-label="Send message"
                 title="Send message"
-                className="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center transition-colors disabled:opacity-40"
+                className="w-9 h-9 rounded-xl bg-brand-orange hover:bg-brand-orangeSoft flex items-center justify-center transition-colors disabled:opacity-40"
               >
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

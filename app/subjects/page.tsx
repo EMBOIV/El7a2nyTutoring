@@ -104,9 +104,9 @@ export default function SubjectsPage() {
       {/* Hero */}
       <section className="relative py-20 text-center overflow-hidden">
         <div className="line-grid absolute inset-0 opacity-50 pointer-events-none" />
-        <div className="orb w-[350px] h-[350px] bg-violet-600/15 animate-float -top-[15%] left-[60%]" />
+        <div className="orb w-[350px] h-[350px] bg-brand-orange opacity-[0.08] animate-float -top-[15%] left-[60%]" />
         <div className="relative z-10 max-w-3xl mx-auto container-pad">
-          <span className="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Curriculum</span>
+            <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Curriculum</span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mt-3 mb-5">
             IGCSE <span className="gradient-text">Subjects</span>
           </h1>
@@ -117,7 +117,7 @@ export default function SubjectsPage() {
       </section>
 
       {/* Filter tabs */}
-      <div className="sticky top-[70px] z-30 bg-dark-bg/80 backdrop-blur-md border-b border-white/[0.06] py-3">
+      <div className="sticky top-[70px] z-30 bg-[#0F1C30]/85 backdrop-blur-xl border-b border-white/[0.06] py-3">
         <div className="max-w-7xl mx-auto container-pad flex gap-2 overflow-x-auto">
           {(['All', 'Foundation', 'Core', 'Extended'] as const).map(f => (
             <button
@@ -125,8 +125,8 @@ export default function SubjectsPage() {
               onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 filter === f
-                  ? 'bg-indigo-600 text-white'
-                  : 'glass text-slate-400 hover:text-white'
+                  ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.35)]'
+                  : 'bg-white/[0.05] border border-white/[0.09] text-[#9BAFC8] hover:text-white hover:border-white/[0.18]'
               }`}
             >
               {f}
@@ -149,7 +149,7 @@ export default function SubjectsPage() {
                 onClick={() => setSelected(subject)}
                 className="group glass rounded-2xl p-6 text-left border border-white/[0.06] hover:border-white/[0.16]
                            transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none
-                           focus-visible:ring-2 focus-visible:ring-indigo-500"
+                           focus-visible:ring-2 focus-visible:ring-brand-orange"
               >
                 {/* Icon */}
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${subject.gradient} flex items-center justify-center text-2xl mb-4 shadow-md`}>
@@ -158,7 +158,7 @@ export default function SubjectsPage() {
 
                 <div className="flex items-start justify-between mb-2">
                   <h3 className="text-white font-semibold text-sm">{subject.name}</h3>
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full border ${difficultyColors[subject.difficulty]}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${difficultyColors[subject.difficulty]}`}>
                     {subject.difficulty.slice(0, 3)}
                   </span>
                 </div>
@@ -167,7 +167,7 @@ export default function SubjectsPage() {
 
                 <div className="flex items-center justify-between text-xs text-slate-500">
                   <span>{subject.sessions} sessions</span>
-                  <span className="text-indigo-400 group-hover:translate-x-1 transition-transform inline-block">View →</span>
+                  <span className="text-brand-orange group-hover:translate-x-1 transition-transform inline-block">View →</span>
                 </div>
               </motion.button>
             ))}
