@@ -7,7 +7,7 @@ import { stepSlide } from '@/lib/animations';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
-type SessionOption = 'Online' | 'Face-to-Face (Private)' | 'WhatsApp Session';
+type SessionOption = 'June / July' | 'October / November' | 'January / February';
 
 // Each selected subject has its own session choice
 interface SubjectSession {
@@ -27,7 +27,7 @@ interface UserSession {
 }
 
 const STEP_LABELS = ['Subjects', 'Sessions', 'Your Info', 'Confirm'];
-const SESSION_OPTIONS: SessionOption[] = ['Online', 'Face-to-Face (Private)', 'WhatsApp Session'];
+const SESSION_OPTIONS: SessionOption[] = ['June / July', 'October / November', 'January / February'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LabeledInput({
@@ -297,7 +297,7 @@ export default function BookingPage() {
               {step === 2 && (
                 <motion.div key="session-step" {...stepSlide}>
                   <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Select Session per Subject</h2>
-                  <p className="text-slate-600 text-sm mb-6">Choose how you&apos;d like to have each session.</p>
+                  <p className="text-slate-600 text-sm mb-6">Choose your target exam session for each subject.</p>
                   <div className="space-y-6">
                     {selections.map(sel => (
                       <div key={sel.subject} className="rounded-xl border border-brand-grayMuted bg-white p-4">
