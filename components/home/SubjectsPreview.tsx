@@ -7,13 +7,8 @@ import { subjects } from '@/lib/subjects';
 
 const PREVIEW = subjects.slice(0, 6);
 
-const DIFF_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Extended: { bg: 'bg-brand-orange/10', text: 'text-brand-orange', border: 'border-brand-orange/30' },
-  Core:     { bg: 'bg-[#7BBF2A]/10',   text: 'text-[#7BBF2A]',    border: 'border-[#7BBF2A]/30' },
-};
-
-function TiltCard({ title, tagline, emoji, sessions, difficulty }: {
-  title: string; tagline: string; emoji: string; sessions: number; difficulty: string;
+function TiltCard({ title, tagline, emoji, sessions }: {
+  title: string; tagline: string; emoji: string; sessions: number;
 }) {
   const reduceMotion = useReducedMotion();
   const ref     = useRef<HTMLDivElement>(null);
@@ -21,8 +16,6 @@ function TiltCard({ title, tagline, emoji, sessions, difficulty }: {
   const rotateY = useMotionValue(0);
   const sRotX   = useSpring(rotateX, { stiffness: 160, damping: 20 });
   const sRotY   = useSpring(rotateY, { stiffness: 160, damping: 20 });
-
-  const dc = DIFF_COLORS[difficulty] ?? DIFF_COLORS['Core'];
 
   return (
     <motion.div
@@ -54,11 +47,15 @@ function TiltCard({ title, tagline, emoji, sessions, difficulty }: {
           {emoji}
         </div>
 
-        <div className="flex items-start justify-between mb-2 relative z-10">
+        <div className="flex items-start justify-between mb-2 relative z-10 gap-2">
           <h3 className="text-[#1B2A44] font-semibold text-base">{title}</h3>
-          <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ml-2 flex-shrink-0 ${dc.bg} ${dc.text} ${dc.border}`}>
-            {difficulty}
-          </span>
+          <div className="flex items-center gap-1 flex-wrap justify-end">
+            {['OL', 'AS', 'A2', 'AL'].map(level => (
+              <span key={level} className="text-[10px] px-1.5 py-0.5 rounded-full border border-[#E2E8F0] text-[#64748B] bg-[#F8FAFC] font-semibold">
+                {level}
+              </span>
+            ))}
+          </div>
         </div>
 
         <p className="text-[#64748B] text-sm leading-relaxed mb-5 relative z-10 flex-1">{tagline}</p>
@@ -117,7 +114,6 @@ export default function SubjectsPreview() {
                   tagline={subject.tagline}
                   emoji={subject.emoji}
                   sessions={subject.sessions}
-                  difficulty={subject.difficulty}
                 />
               </Link>
             </motion.div>

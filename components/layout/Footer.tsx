@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const FOOTER_LINKS = {
   Platform: [
@@ -62,8 +63,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center shadow-[0_4px_14px_rgba(242,116,5,0.20)]">
-                <span className="text-white font-black text-sm">E</span>
+              <div className="w-9 h-9 rounded-xl overflow-hidden border border-[#E2E8F0] shadow-[0_4px_14px_rgba(27,42,68,0.10)] bg-white">
+                <Image
+                  src="/Images/El7a2nyproo1.png"
+                  alt="El7a2ny logo"
+                  width={36}
+                  height={36}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <span className="font-bold text-lg">
                 <span className="text-[#1B2A44]">El7a2ny</span>

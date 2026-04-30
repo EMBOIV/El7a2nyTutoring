@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -70,8 +71,15 @@ export default function Navbar() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[70px] flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center shadow-[0_4px_14px_rgba(242,116,5,0.45)] group-hover:shadow-[0_4px_20px_rgba(242,116,5,0.65)] transition-shadow duration-300">
-            <span className="text-white font-black text-sm">E</span>
+          <div className="w-9 h-9 rounded-xl overflow-hidden border border-[#E2E8F0] shadow-[0_4px_14px_rgba(27,42,68,0.10)] group-hover:shadow-[0_4px_20px_rgba(27,42,68,0.16)] transition-shadow duration-300 bg-white">
+            <Image
+              src="/Images/El7a2nyproo1.png"
+              alt="El7a2ny logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <span className="font-bold text-lg">
             <span className="text-[#1B2A44]">El7a2ny</span>
