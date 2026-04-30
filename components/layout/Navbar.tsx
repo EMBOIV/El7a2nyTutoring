@@ -14,6 +14,18 @@ const NAV_LINKS = [
   { href: '/contact',  label: 'Contact' },
 ];
 
+function AvatarBadge({ session, size = 'md' }: { session: AppSession; size?: 'sm' | 'md' }) {
+  const cls = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
+  if (session.avatar?.startsWith('data:image')) {
+    return <img src={session.avatar} alt={session.name} className={`${cls} rounded-full object-cover border border-white/[0.14]`} />;
+  }
+  return (
+    <div className={`${cls} rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white font-bold shadow-[0_2px_8px_rgba(242,116,5,0.40)]`}>
+      {session.avatar || getInitials(session.name)}
+    </div>
+  );
+}
+
 export default function Navbar() {
   const pathname    = usePathname();
   const router      = useRouter();
@@ -108,12 +120,9 @@ export default function Navbar() {
         {/* Desktop right */}
         <div className="hidden md:flex items-center gap-2">
           {session ? (
-            <>
-              {/* Avatar + name */}
-              <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] transition-colors group">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white text-xs font-bold shadow-[0_2px_8px_rgba(242,116,5,0.40)]">
-                  {getInitials(session.name)}
-                </div>
+            <div className="relative group">
+              <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] transition-colors">
+                <AvatarBadge session={session} size="sm" />
                 <div className="leading-tight">
                   <p className="text-white text-sm font-medium">{session.name.split(' ')[0]}</p>
                   {session.role === 'teacher' && (
@@ -121,10 +130,13 @@ export default function Navbar() {
                   )}
                 </div>
               </Link>
-              <button onClick={logout} className="px-3 py-2 text-sm font-medium text-[#9BAFC8] hover:text-white transition-colors rounded-xl hover:bg-white/[0.05]">
-                Logout
-              </button>
-            </>
+              <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
+                <div className="glass rounded-xl border border-white/[0.10] p-1 min-w-[160px] shadow-xl">
+                  <Link href="/profile" className="block px-3 py-2 text-sm text-[#9BAFC8] hover:text-white rounded-lg hover:bg-white/[0.05]">My Profile</Link>
+                  <button onClick={logout} className="w-full text-left px-3 py-2 text-sm text-[#9BAFC8] hover:text-white rounded-lg hover:bg-white/[0.05]">Logout</button>
+                </div>
+              </div>
+            </div>
           ) : (
             <>
               <Link href="/auth" className="px-4 py-2 text-sm font-medium text-[#9BAFC8] hover:text-white transition-colors duration-200">
@@ -187,9 +199,7 @@ export default function Navbar() {
                 {session ? (
                   <div className="space-y-1">
                     <Link href="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.05] transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white text-xs font-bold">
-                        {getInitials(session.name)}
-                      </div>
+                      <AvatarBadge session={session} size="sm" />
                       <div>
                         <p className="text-white text-sm font-medium">{session.name}</p>
                         <p className="text-[#9BAFC8] text-xs capitalize">{session.role}</p>

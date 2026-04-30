@@ -5,10 +5,11 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { subjects } from '@/lib/subjects';
 import { stepSlide } from '@/lib/animations';
 import { addSession } from '@/lib/auth';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
-type SessionOption = 'June / July' | 'October / November' | 'January / February';
+type SessionOption = 'OL' | 'AS' | 'AL';
 
 // Each selected subject has its own session choice
 interface SubjectSession {
@@ -28,7 +29,7 @@ interface UserSession {
 }
 
 const STEP_LABELS = ['Subjects', 'Sessions', 'Your Info', 'Confirm'];
-const SESSION_OPTIONS: SessionOption[] = ['June / July', 'October / November', 'January / February'];
+const SESSION_OPTIONS: SessionOption[] = ['OL', 'AS', 'AL'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LabeledInput({
@@ -48,6 +49,7 @@ function LabeledInput({
 
 export default function BookingPage() {
   const reduceMotion = useReducedMotion();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -72,6 +74,23 @@ export default function BookingPage() {
       }
     } catch { /* ignore */ }
   }, []);
+
+  useEffect(() => {
+    const preSubject = searchParams.get('subject');
+    const preLevel = searchParams.get('level');
+    if (!preSubject) return;
+
+    const matched = subjects.find(s => s.name.toLowerCase() === preSubject.toLowerCase());
+    if (!matched) return;
+
+    const selectedLevel: SessionOption | '' =
+      preLevel === 'OL' || preLevel === 'AS' || preLevel === 'AL' ? preLevel : '';
+
+    setSelections(prev => {
+      if (prev.some(s => s.subject === matched.name)) return prev;
+      return [{ subject: matched.name, emoji: matched.emoji, session: selectedLevel }, ...prev];
+    });
+  }, [searchParams]);
 
   const progressScale = useMemo(() => {
     if (loggedInUser) {
@@ -149,7 +168,7 @@ export default function BookingPage() {
           time: '',
           sessionType: 'Online',
           status: 'pending',
-          notes: `Session: ${s.session}`,
+          notes: `Level: ${s.session}`,
           createdAt: new Date().toISOString(),
         });
       });
@@ -206,6 +225,11 @@ export default function BookingPage() {
       <section className="py-16 text-center relative overflow-hidden">
         <div className="line-grid absolute inset-0 opacity-35 pointer-events-none" />
         <div className="relative z-10 max-w-2xl mx-auto container-pad">
+          <div className="mb-4 text-left">
+            <Link href="/subjects" className="inline-flex items-center text-sm text-slate-600 hover:text-brand-orange transition-colors">
+              ← Back to Subjects
+            </Link>
+          </div>
           <p className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Fast Booking</p>
           <h1 className="text-4xl md:text-5xl font-extrabold text-brand-navy mt-3 mb-4">
             IGCSE Booking <span className="gradient-text">in 4 Steps</span>
@@ -315,8 +339,8 @@ export default function BookingPage() {
               {/* ── STEP 2: Pick session per subject ── */}
               {step === 2 && (
                 <motion.div key="session-step" {...stepSlide}>
-                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Select Session per Subject</h2>
-                  <p className="text-slate-600 text-sm mb-6">Choose your target exam session for each subject.</p>
+                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Select Level per Subject</h2>
+                  <p className="text-slate-600 text-sm mb-6">Choose OL, AS, or AL for each selected subject.</p>
                   <div className="space-y-6">
                     {selections.map(sel => (
                       <div key={sel.subject} className="rounded-xl border border-brand-grayMuted bg-white p-4">

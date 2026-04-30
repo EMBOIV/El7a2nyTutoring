@@ -17,11 +17,14 @@ import { subjects as SUBJECTS_LIST } from '@/lib/subjects';
 const SESSION_TYPES = ['Online', 'Face-to-Face', 'WhatsApp'] as const;
 const PROGRESS_COLORS = ['from-brand-orange to-brand-orangeSoft', 'from-[#7BBF2A] to-[#5a9c1a]', 'from-[#A5C8FF] to-[#6aa0e8]', 'from-[#FFD166] to-[#f0b429]'];
 
-function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' | 'lg' }) {
+function Avatar({ name, avatar, size = 'md' }: { name: string; avatar?: string; size?: 'sm' | 'md' | 'lg' }) {
   const sz = size === 'sm' ? 'w-8 h-8 text-xs' : size === 'lg' ? 'w-14 h-14 text-lg' : 'w-10 h-10 text-sm';
+  if (avatar?.startsWith('data:image')) {
+    return <img src={avatar} alt={name} className={`${sz} rounded-full object-cover border border-white/[0.14] flex-shrink-0`} />;
+  }
   return (
     <div className={`${sz} rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white font-bold shadow-[0_2px_8px_rgba(242,116,5,0.35)] flex-shrink-0`}>
-      {getInitials(name)}
+      {avatar || getInitials(name)}
     </div>
   );
 }
@@ -63,7 +66,7 @@ function StudentDashboard({ session }: { session: AppSession }) {
     <div>
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <Avatar name={session.name} size="lg" />
+          <Avatar name={session.name} avatar={session.avatar} size="lg" />
           <div>
             <p className="text-[#9BAFC8] text-sm">Welcome back 👋</p>
             <h1 className="text-white font-bold text-2xl mt-0.5">{session.name}</h1>
@@ -301,7 +304,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
       </AnimatePresence>
 
       <div className="flex items-center gap-4 mb-8 flex-wrap">
-        <Avatar name={session.name} size="lg" />
+        <Avatar name={session.name} avatar={session.avatar} size="lg" />
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-white font-bold text-2xl">{session.name}</h1>
@@ -347,7 +350,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
                   const avg = sp.length ? Math.round(sp.reduce((a, b) => a + b.progress, 0) / sp.length) : null;
                   return (
                     <div key={s.email} className="glass rounded-2xl p-5 border border-white/[0.06] flex flex-wrap items-center gap-4">
-                      <Avatar name={s.name} />
+                      <Avatar name={s.name} avatar={s.avatar} />
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-semibold">{s.name}</p>
                         <p className="text-[#9BAFC8] text-xs">{s.email}</p>

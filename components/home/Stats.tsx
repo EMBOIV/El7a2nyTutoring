@@ -7,7 +7,7 @@ interface Stat { value: number; suffix: string; label: string; icon: string; col
 
 const STATS: Stat[] = [
   { value: 500,  suffix: '+', label: 'Students Helped',  icon: '👩‍🎓', color: 'text-brand-orange',  glow: 'rgba(242,116,5,0.20)' },
-  { value: 12,   suffix: '',  label: 'IGCSE Subjects',   icon: '📚', color: 'text-[#7BBF2A]',      glow: 'rgba(123,191,42,0.20)' },
+  { value: 13,   suffix: '',  label: 'IGCSE Subjects',   icon: '📚', color: 'text-[#7BBF2A]',      glow: 'rgba(123,191,42,0.20)' },
   { value: 95,   suffix: '%', label: 'Success Rate',     icon: '🏆', color: 'text-[#A5C8FF]',      glow: 'rgba(165,200,255,0.20)' },
   { value: 4,    suffix: '+', label: 'Years Experience', icon: '⭐', color: 'text-[#FFD166]',      glow: 'rgba(255,209,102,0.20)' },
 ];

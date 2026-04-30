@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { subjects } from '@/lib/subjects';
 
 interface Message {
   id: number;
@@ -9,12 +11,18 @@ interface Message {
   text: string;
 }
 
+interface QuickOption {
+  id: string;
+  label: string;
+  action: () => void;
+}
+
 const BOT_RESPONSES: Record<string, string> = {
-  default: "I'm here to help! Ask me about subjects, booking, pricing, or anything else.",
-  hello: 'Hi there! 👋 How can I help you with your IGCSE studies today?',
+  default: "I'm here to help. You can ask about subjects, levels (OL/AS/AL), booking, or pricing.",
+  hello: 'Welcome to El7a2ny Tutoring 👋 Need help with anything or want to book a subject now?',
   pricing: 'Our sessions start from $30/hour. Bundle packages are available for better value. Visit the Booking page to see options!',
-  booking: 'You can book a session on our Booking page. Choose your subject, date, and time slot — it takes under 2 minutes!',
-  subjects: 'We cover 12 IGCSE subjects including Maths, Physics, Chemistry, Biology, ICT, English, History, Geography, Economics, Business and Arabic.',
+  booking: 'You can book by subject with OL/AS/AL level in under 2 minutes. I can prefill it for you now.',
+  subjects: 'We cover: Maths, Physics, Chemistry, Biology, Human Biology, IT, CS, Accounting, Business, Economics, Combined Science, Arabic, and National Arabic (Year 12 Only).',
   help: 'I can tell you about our subjects, pricing, booking process, or tutors. What would you like to know?',
 };
 
@@ -29,27 +37,127 @@ function getBotResponse(input: string): string {
 }
 
 export default function ChatWidget() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
+  const [quickOptions, setQuickOptions] = useState<QuickOption[]>([]);
+  const [bookingSubject, setBookingSubject] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
-    { id: 0, role: 'bot', text: "Hi! I'm El7a2ny's virtual assistant. How can I help you today?" },
+    { id: 0, role: 'bot', text: BOT_RESPONSES.hello },
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const pushBot = (text: string) => {
+    setMessages(prev => [...prev, { id: Date.now(), role: 'bot', text }]);
+  };
+
+  const pushUser = (text: string) => {
+    setMessages(prev => [...prev, { id: Date.now(), role: 'user', text }]);
+  };
+
+  const startBookingFlow = () => {
+    pushBot('Great. Choose a subject and I will prefill it in booking for you.');
+    setQuickOptions(
+      subjects.map(subject => ({
+        id: `subject-${subject.id}`,
+        label: subject.name,
+        action: () => {
+          pushUser(subject.name);
+          setBookingSubject(subject.name);
+          pushBot(`Perfect. Now choose level for ${subject.name}.`);
+          setQuickOptions([
+            {
+              id: 'level-ol',
+              label: 'OL',
+              action: () => completeBooking(subject.name, 'OL'),
+            },
+            {
+              id: 'level-as',
+              label: 'AS',
+              action: () => completeBooking(subject.name, 'AS'),
+            },
+            {
+              id: 'level-al',
+              label: 'AL',
+              action: () => completeBooking(subject.name, 'AL'),
+            },
+          ]);
+        },
+      }))
+    );
+  };
+
+  const completeBooking = (subject: string, level: 'OL' | 'AS' | 'AL') => {
+    pushUser(level);
+    pushBot(`Done. Opening booking with ${subject} (${level}) selected first. You can add more subjects there.`);
+    setQuickOptions([]);
+    const url = `/booking?subject=${encodeURIComponent(subject)}&level=${level}`;
+    setTimeout(() => router.push(url), 500);
+  };
+
+  const resetQuickOptions = () => {
+    setQuickOptions([
+      { id: 'book', label: 'Book a subject', action: startBookingFlow },
+      {
+        id: 'subjects',
+        label: 'View subjects',
+        action: () => {
+          pushUser('View subjects');
+          pushBot(BOT_RESPONSES.subjects);
+          setQuickOptions([]);
+        },
+      },
+      {
+        id: 'pricing',
+        label: 'Pricing',
+        action: () => {
+          pushUser('Pricing');
+          pushBot(BOT_RESPONSES.pricing);
+          setQuickOptions([]);
+        },
+      },
+      {
+        id: 'need-help',
+        label: 'Need help',
+        action: () => {
+          pushUser('Need help');
+          pushBot(BOT_RESPONSES.help);
+          setQuickOptions([]);
+        },
+      },
+    ]);
+  };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    if (open) resetQuickOptions();
+    if (!open) {
+      setQuickOptions([]);
+      setBookingSubject(null);
+    }
+  }, [open]);
+
   const send = () => {
     const trimmed = input.trim();
     if (!trimmed) return;
-    const userMsg: Message = { id: Date.now(), role: 'user', text: trimmed };
-    setMessages(prev => [...prev, userMsg]);
+    pushUser(trimmed);
     setInput('');
     // Simulate bot typing delay
     setTimeout(() => {
-      const botMsg: Message = { id: Date.now() + 1, role: 'bot', text: getBotResponse(trimmed) };
-      setMessages(prev => [...prev, botMsg]);
+      const lower = trimmed.toLowerCase();
+      if (lower.includes('book')) {
+        pushBot(BOT_RESPONSES.booking);
+        startBookingFlow();
+        return;
+      }
+      if (bookingSubject && (lower === 'ol' || lower === 'as' || lower === 'al')) {
+        completeBooking(bookingSubject, lower.toUpperCase() as 'OL' | 'AS' | 'AL');
+        return;
+      }
+      pushBot(getBotResponse(trimmed));
     }, 600);
   };
 
@@ -109,6 +217,19 @@ export default function ChatWidget() {
                   </div>
                 </div>
               ))}
+              {quickOptions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {quickOptions.map(option => (
+                    <button
+                      key={option.id}
+                      onClick={option.action}
+                      className="px-3 py-1.5 rounded-full text-xs bg-white/[0.07] border border-white/[0.10] text-[#D9E4F5] hover:border-brand-orange/50 hover:text-white transition-colors"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div ref={bottomRef} />
             </div>
 

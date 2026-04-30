@@ -28,7 +28,7 @@ function buildSubjectsTable(entries: SubjectEntry[]): string {
       <thead>
         <tr style="background:#1B2A44;">
           <th style="padding:10px 14px;text-align:left;color:#fff;font-size:13px;">Subject</th>
-          <th style="padding:10px 14px;text-align:left;color:#fff;font-size:13px;">Exam Session</th>
+          <th style="padding:10px 14px;text-align:left;color:#fff;font-size:13px;">Level</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>

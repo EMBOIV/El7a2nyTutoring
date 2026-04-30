@@ -80,8 +80,8 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
           </div>
 
           <div className="flex gap-3">
-            <Link href="/booking" className="btn-primary flex-1 py-3 text-sm text-center">
-              Book a Session
+            <Link href={`/booking?subject=${encodeURIComponent(subject.name)}`} className="btn-primary flex-1 py-3 text-sm text-center">
+              Book Subject Now
             </Link>
             <button onClick={onClose} className="btn-ghost px-5 py-3 text-sm">
               Close
@@ -111,7 +111,7 @@ export default function SubjectsPage() {
             IGCSE <span className="gradient-text">Subjects</span>
           </h1>
           <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            Choose from 12 expertly taught IGCSE subjects. Click any card to explore the syllabus.
+            Choose from 13 expertly taught IGCSE subjects. Click any card to explore the syllabus.
           </p>
         </div>
       </section>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEventHandler } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { getSession, getUsers, saveUsers, saveSession, clearSession, getInitials } from '@/lib/auth';
@@ -16,7 +16,8 @@ export default function ProfilePage() {
 
   // Account form
   const [name, setName] = useState('');
-  const [selectedEmoji, setSelectedEmoji] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   // Password form
   const [pw, setPw] = useState({ current: '', next: '', confirm: '' });
@@ -29,7 +30,7 @@ export default function ProfilePage() {
     if (!s) { router.push('/auth'); return; }
     setSession(s);
     setName(s.name);
-    setSelectedEmoji(s.avatar ?? '');
+    setSelectedAvatar(s.avatar ?? '');
   }, [router]);
 
   if (!session) return null;
@@ -38,13 +39,35 @@ export default function ProfilePage() {
     if (!name.trim()) { showToast('Name cannot be empty.'); return; }
     const users = getUsers();
     const updated = users.map(u =>
-      u.email === session.email ? { ...u, name: name.trim(), avatar: selectedEmoji } : u
+      u.email === session.email ? { ...u, name: name.trim(), avatar: selectedAvatar } : u
     );
     saveUsers(updated);
-    const newSession = { ...session, name: name.trim(), avatar: selectedEmoji };
+    const newSession = { ...session, name: name.trim(), avatar: selectedAvatar };
     saveSession(newSession);
     setSession(newSession);
     showToast('Profile updated ✓');
+  };
+
+  const onUploadPhoto: ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select an image file.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError('Image must be smaller than 2MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === 'string') {
+        setSelectedAvatar(result);
+        setUploadError('');
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const savePassword = () => {
@@ -73,6 +96,7 @@ export default function ProfilePage() {
 
   const fc = 'w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 text-white text-sm placeholder-[#6B829E] focus:outline-none focus:border-brand-orange/60 transition-all';
   const lc = 'block text-[#9BAFC8] text-sm font-medium mb-1.5';
+  const previewName = name || session.name;
 
   return (
     <div className="pt-[70px] min-h-screen">
@@ -88,7 +112,9 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="flex items-center gap-4 mb-10">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white font-bold text-xl shadow-[0_4px_20px_rgba(242,116,5,0.40)]">
-            {selectedEmoji || getInitials(session.name)}
+            {selectedAvatar?.startsWith('data:image')
+              ? <img src={selectedAvatar} alt={previewName} className="w-full h-full rounded-2xl object-cover" />
+              : (selectedAvatar || getInitials(previewName))}
           </div>
           <div>
             <h1 className="text-white font-bold text-2xl">{session.name}</h1>
@@ -129,21 +155,33 @@ export default function ProfilePage() {
               <label className={lc}>Avatar</label>
               <div className="flex flex-wrap gap-2 mt-1">
                 <button
-                  onClick={() => setSelectedEmoji('')}
+                  onClick={() => setSelectedAvatar('')}
                   className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold border transition-all ${
-                    !selectedEmoji ? 'border-brand-orange bg-brand-orange/15 text-brand-orange' : 'border-white/[0.10] bg-white/[0.04] text-[#9BAFC8]'
+                    !selectedAvatar ? 'border-brand-orange bg-brand-orange/15 text-brand-orange' : 'border-white/[0.10] bg-white/[0.04] text-[#9BAFC8]'
                   }`}
                 >
-                  {getInitials(name || session.name)}
+                  {getInitials(previewName)}
                 </button>
                 {AVATARS.map(e => (
-                  <button key={e} onClick={() => setSelectedEmoji(e)}
+                  <button key={e} onClick={() => setSelectedAvatar(e)}
                     className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border transition-all ${
-                      selectedEmoji === e ? 'border-brand-orange bg-brand-orange/15 scale-110' : 'border-white/[0.10] bg-white/[0.04] hover:border-white/[0.25]'
+                      selectedAvatar === e ? 'border-brand-orange bg-brand-orange/15 scale-110' : 'border-white/[0.10] bg-white/[0.04] hover:border-white/[0.25]'
                     }`}
                   >{e}</button>
                 ))}
               </div>
+              <div className="mt-3 flex items-center gap-3 flex-wrap">
+                <label className="btn-ghost px-4 py-2 text-xs cursor-pointer">
+                  Upload your photo
+                  <input type="file" accept="image/*" className="hidden" onChange={onUploadPhoto} />
+                </label>
+                {selectedAvatar?.startsWith('data:image') && (
+                  <button onClick={() => setSelectedAvatar('')} className="text-xs text-[#9BAFC8] hover:text-white underline">
+                    Remove photo
+                  </button>
+                )}
+              </div>
+              {uploadError && <p className="text-red-400 text-xs mt-2">{uploadError}</p>}
             </div>
 
             <div className="flex gap-3 pt-2">
