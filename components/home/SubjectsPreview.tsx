@@ -1,80 +1,73 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useInView, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
+import { motion, useReducedMotion, useMotionValue, useSpring } from 'framer-motion';
 import { useRef } from 'react';
 import { subjects } from '@/lib/subjects';
-import { fadeSlideUp, staggerContainer } from '@/lib/animations';
 
 const PREVIEW = subjects.slice(0, 6);
 
-function TiltCard({
-  title,
-  tagline,
-  emoji,
-  sessions,
-  difficulty,
-}: {
-  title: string;
-  tagline: string;
-  emoji: string;
-  sessions: number;
-  difficulty: string;
+const DIFF_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  Extended: { bg: 'bg-brand-orange/10', text: 'text-brand-orange', border: 'border-brand-orange/30' },
+  Core:     { bg: 'bg-[#7BBF2A]/10',   text: 'text-[#7BBF2A]',    border: 'border-[#7BBF2A]/30' },
+};
+
+function TiltCard({ title, tagline, emoji, sessions, difficulty }: {
+  title: string; tagline: string; emoji: string; sessions: number; difficulty: string;
 }) {
   const reduceMotion = useReducedMotion();
-  const ref = useRef<HTMLDivElement | null>(null);
-
+  const ref     = useRef<HTMLDivElement>(null);
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
-  const softRotateX = useSpring(rotateX, { stiffness: 180, damping: 18, mass: 0.8 });
-  const softRotateY = useSpring(rotateY, { stiffness: 180, damping: 18, mass: 0.8 });
+  const sRotX   = useSpring(rotateX, { stiffness: 160, damping: 20 });
+  const sRotY   = useSpring(rotateY, { stiffness: 160, damping: 20 });
 
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduceMotion || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
-    rotateY.set((px - 0.5) * 8);
-    rotateX.set((0.5 - py) * 8);
-  };
-
-  const reset = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-  };
+  const dc = DIFF_COLORS[difficulty] ?? DIFF_COLORS['Core'];
 
   return (
     <motion.div
       ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={reset}
-      style={reduceMotion ? undefined : { rotateX: softRotateX, rotateY: softRotateY, transformStyle: 'preserve-3d' }}
-      whileHover={reduceMotion ? undefined : { y: -6 }}
-      className="group rounded-2xl p-[1px] bg-gradient-to-b from-brand-orange/45 to-brand-navyDeep/30"
+      onMouseMove={(e) => {
+        if (reduceMotion || !ref.current) return;
+        const r = ref.current.getBoundingClientRect();
+        rotateY.set(((e.clientX - r.left) / r.width - 0.5) * 10);
+        rotateX.set(-(((e.clientY - r.top)  / r.height - 0.5) * 10));
+      }}
+      onMouseLeave={() => { rotateX.set(0); rotateY.set(0); }}
+      style={reduceMotion ? undefined : { rotateX: sRotX, rotateY: sRotY, transformStyle: 'preserve-3d' }}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.25 }}
+      className="group relative h-full"
     >
-      <div className="rounded-2xl bg-white p-6 border border-brand-grayMuted/80 h-full transition-shadow duration-200 group-hover:shadow-[0_14px_30px_rgba(22,34,56,0.24)]">
-        <div className="inline-flex w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-brand-navyDeep items-center justify-center text-white text-2xl mb-4">
+      {/* Outer border gradient */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-brand-orange/30 to-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ padding: '1px', borderRadius: '16px' }} />
+
+      <div className="relative rounded-2xl card-dark border border-white/[0.08] p-6 h-full flex flex-col group-hover:border-brand-orange/25 transition-all duration-300"
+        style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+      >
+        {/* Shine on hover */}
+        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%)' }}
+        />
+
+        <div className="inline-flex w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-[#0F1C30] border border-white/[0.10] items-center justify-center text-2xl mb-4 relative z-10 shadow-lg">
           {emoji}
         </div>
 
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-brand-navy font-semibold">{title}</h3>
-          <span
-            className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${
-              difficulty === 'Extended'
-                ? 'bg-brand-orange/10 text-brand-orange border-brand-orange/30'
-                : 'bg-brand-navy/8 text-brand-navy border-brand-grayMuted'
-            }`}
-          >
+        <div className="flex items-start justify-between mb-2 relative z-10">
+          <h3 className="text-white font-semibold text-base">{title}</h3>
+          <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ml-2 flex-shrink-0 ${dc.bg} ${dc.text} ${dc.border}`}>
             {difficulty}
           </span>
         </div>
 
-        <p className="text-slate-600 text-sm leading-relaxed mb-4">{tagline}</p>
+        <p className="text-[#9BAFC8] text-sm leading-relaxed mb-5 relative z-10 flex-1">{tagline}</p>
 
-        <div className="flex items-center justify-between text-xs text-slate-600">
-          <span>{sessions} sessions available</span>
-          <span className="text-brand-orange group-hover:translate-x-1 transition-transform inline-block">Learn more →</span>
+        <div className="flex items-center justify-between text-xs text-[#6B829E] relative z-10 mt-auto">
+          <span>{sessions} sessions</span>
+          <span className="text-brand-orange group-hover:translate-x-1.5 transition-transform duration-200 inline-block">
+            Learn more →
+          </span>
         </div>
       </div>
     </motion.div>
@@ -82,36 +75,43 @@ function TiltCard({
 }
 
 export default function SubjectsPreview() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
-
   return (
-    <section className="section">
-      <div className="max-w-7xl mx-auto container-pad">
+    <section className="section relative overflow-hidden">
+      <div aria-hidden className="absolute inset-0 pointer-events-none">
+        <div className="orb w-[500px] h-[500px] bg-[#1B2A44] opacity-80 -bottom-40 -right-20" />
+        <div className="absolute inset-0 dot-grid opacity-20" />
+      </div>
+
+      <div className="max-w-7xl mx-auto container-pad relative z-10">
         <motion.div
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
-          variants={fadeSlideUp}
-          className="text-center mb-14"
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-16"
         >
-          <span className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Curriculum</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-brand-navy mt-2 mb-4">IGCSE Subjects We Cover</h2>
-          <p className="text-slate-700 max-w-xl mx-auto">
-            From sciences to humanities, we offer expert tutoring across all major IGCSE subjects.
+          <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
+            Curriculum
+          </span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mt-4 mb-5 leading-tight">
+            IGCSE Subjects
+            <span className="gradient-text"> We Cover</span>
+          </h2>
+          <p className="text-[#9BAFC8] max-w-xl mx-auto text-lg">
+            From sciences to humanities — expert tutoring across every major IGCSE subject, tailored to you.
           </p>
         </motion.div>
 
-        <motion.div
-          ref={ref}
-          initial="hidden"
-          animate={inView ? 'visible' : 'hidden'}
-          variants={staggerContainer}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
-          {PREVIEW.map((subject) => (
-            <motion.div key={subject.id} variants={fadeSlideUp}>
-              <Link href="/subjects" aria-label={`Explore ${subject.name}`}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {PREVIEW.map((subject, i) => (
+            <motion.div
+              key={subject.id}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Link href="/subjects" aria-label={`Explore ${subject.name}`} className="block h-full">
                 <TiltCard
                   title={subject.name}
                   tagline={subject.tagline}
@@ -122,20 +122,25 @@ export default function SubjectsPreview() {
               </Link>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="text-center mt-10"
+          transition={{ duration: 0.45 }}
+          className="text-center mt-12"
         >
-          <Link href="/subjects" className="btn-ghost px-8 py-3 text-sm">
+          <Link href="/subjects" className="btn-ghost px-9 py-3.5 text-sm">
             View All 12 Subjects
+            <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </Link>
         </motion.div>
       </div>
     </section>
   );
 }
+
+

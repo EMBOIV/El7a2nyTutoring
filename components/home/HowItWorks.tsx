@@ -1,23 +1,34 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { fadeSlideUp, staggerContainer } from '@/lib/animations';
 
 const STEPS = [
   {
     number: '01',
+    icon: '🎯',
     title: 'Choose Your Subject',
-    description: 'Browse our IGCSE subjects and pick the one(s) you need help with.',
+    description: 'Browse our full IGCSE curriculum and select the subject(s) you need. Multiple subjects, one seamless booking.',
+    accent: 'from-brand-orange/20 to-brand-orange/5',
+    border: 'border-brand-orange/30',
+    glow: 'rgba(242,116,5,0.15)',
   },
   {
     number: '02',
+    icon: '📅',
     title: 'Book a Session',
-    description: 'Pick your exam session and submit your details in under one minute.',
+    description: 'Pick your preferred exam session and submit your details in under 60 seconds. Simple, fast, no commitment.',
+    accent: 'from-[#7BBF2A]/20 to-[#7BBF2A]/5',
+    border: 'border-[#7BBF2A]/30',
+    glow: 'rgba(123,191,42,0.15)',
   },
   {
     number: '03',
+    icon: '🚀',
     title: 'Learn & Improve',
-    description: 'Join personalised sessions, track progress, and raise your exam confidence.',
+    description: 'Join personalised sessions with expert tutors, track your progress weekly, and walk into your exam with confidence.',
+    accent: 'from-[#A5C8FF]/20 to-[#A5C8FF]/5',
+    border: 'border-[#A5C8FF]/30',
+    glow: 'rgba(165,200,255,0.15)',
   },
 ];
 
@@ -25,41 +36,73 @@ export default function HowItWorks() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="section">
-      <div className="max-w-7xl mx-auto container-pad">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-70px' }} variants={fadeSlideUp} className="text-center mb-14">
-          <span className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Process</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-brand-navy mt-2 mb-4">How It Works</h2>
-          <p className="text-slate-700 max-w-xl mx-auto">Three clear steps to unlock your best IGCSE result.</p>
+    <section className="section relative overflow-hidden">
+      {/* bg decoration */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none">
+        <div className="orb w-96 h-96 bg-brand-orange opacity-[0.05] -top-20 -right-20" />
+        <div className="orb w-80 h-80 bg-[#1B2A44] opacity-60 bottom-0 -left-10" />
+        <div className="absolute inset-0 line-grid opacity-30" />
+      </div>
+
+      <div className="max-w-7xl mx-auto container-pad relative z-10">
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-70px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-20"
+        >
+          <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
+            Process
+          </span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mt-4 mb-5 leading-tight">
+            Three Steps to Your
+            <span className="gradient-text"> Best Grade</span>
+          </h2>
+          <p className="text-[#9BAFC8] max-w-lg mx-auto text-lg">
+            A clear, proven process that takes you from sign-up to exam confidence.
+          </p>
         </motion.div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-70px' }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 relative"
-        >
-          <div className="hidden md:block absolute top-10 left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] h-px bg-gradient-to-r from-brand-navy/30 via-brand-orange/35 to-brand-navyDeep/30" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          {/* Connector line */}
+          <div
+            aria-hidden
+            className="hidden md:block absolute top-12 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px"
+            style={{ background: 'linear-gradient(90deg, rgba(242,116,5,0.5) 0%, rgba(165,200,255,0.5) 100%)' }}
+          />
 
-          {STEPS.map((step) => (
-            <motion.div key={step.number} variants={fadeSlideUp} className="relative text-center group">
+          {STEPS.map((step, i) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              className={`relative rounded-2xl p-7 card-dark border ${step.border} card-dark-hover group`}
+              style={{ boxShadow: `0 0 30px ${step.glow}` }}
+            >
+              {/* Step number watermark */}
+              <span className="absolute top-4 right-5 text-5xl font-black text-white/[0.04] select-none">{step.number}</span>
+
+              {/* Icon */}
               <motion.div
-                animate={reduceMotion ? undefined : { y: [0, -3, 0] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                className="inline-flex w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-navy to-brand-navyDeep items-center justify-center text-white mb-6 shadow-lg mx-auto relative z-10"
+                animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
+                transition={{ duration: 3 + i, repeat: Infinity, ease: 'easeInOut' }}
+                className={`inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br ${step.accent} border ${step.border} items-center justify-center text-2xl mb-5 relative z-10`}
               >
-                <span className="font-bold">{step.number}</span>
+                {step.icon}
               </motion.div>
 
-              <span className="absolute top-2 right-[calc(50%-48px)] text-6xl font-black text-brand-orange/10 select-none">{step.number}</span>
-
-              <h3 className="text-brand-navy font-semibold text-lg mb-3">{step.title}</h3>
-              <p className="text-slate-700 text-sm leading-relaxed max-w-xs mx-auto">{step.description}</p>
+              <h3 className="text-white font-semibold text-lg mb-3">{step.title}</h3>
+              <p className="text-[#9BAFC8] text-sm leading-relaxed">{step.description}</p>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 }
+
+

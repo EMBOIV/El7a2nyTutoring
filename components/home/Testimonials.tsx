@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TESTIMONIALS } from '@/lib/utils';
 
+const STARS = Array(5).fill(null);
+
 export default function Testimonials() {
   const [active, setActive] = useState(0);
   const total = TESTIMONIALS.length;
@@ -11,67 +13,94 @@ export default function Testimonials() {
   const next = useCallback(() => setActive(a => (a + 1) % total), [total]);
   const prev = () => setActive(a => (a - 1 + total) % total);
 
-  // Auto-advance every 5s
   useEffect(() => {
-    const id = setInterval(next, 5000);
+    const id = setInterval(next, 5500);
     return () => clearInterval(id);
   }, [next]);
 
   const t = TESTIMONIALS[active];
 
   return (
-    <section className="section bg-dark-surface/40">
-      <div className="max-w-7xl mx-auto container-pad">
-        {/* Heading */}
-        <div className="text-center mb-14">
-          <span className="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Reviews</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mt-2">
-            Hear From Our Students
+    <section className="section relative overflow-hidden">
+      <div aria-hidden className="absolute inset-0 pointer-events-none">
+        <div className="orb w-[600px] h-[600px] bg-brand-orange opacity-[0.06] -top-40 left-1/2 -translate-x-1/2" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.015] to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
+      </div>
+
+      <div className="max-w-7xl mx-auto container-pad relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-70px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-16"
+        >
+          <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
+            Reviews
+          </span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mt-4 mb-5 leading-tight">
+            Students Who
+            <span className="gradient-text"> Succeeded</span>
           </h2>
-        </div>
+          <p className="text-[#9BAFC8] max-w-lg mx-auto text-lg">
+            Real results from real IGCSE students.
+          </p>
+        </motion.div>
 
         <div className="max-w-3xl mx-auto">
-          {/* Card — AnimatePresence with mode=wait: exit before enter → no layout shift */}
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="glass rounded-2xl p-8 md:p-10 border border-white/[0.07]"
+              initial={{ opacity: 0, x: 32, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -32, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="relative rounded-2xl p-8 md:p-10 card-dark border border-white/[0.09]"
+              style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset' }}
             >
-              {/* Quote icon */}
-              <div className="text-4xl text-indigo-400/40 font-serif mb-4 select-none">&ldquo;</div>
+              {/* Card shine */}
+              <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%)' }}
+              />
 
-              <p className="text-slate-200 text-lg leading-relaxed mb-8">{t.text}</p>
+              {/* Stars */}
+              <div className="flex gap-1 mb-6">
+                {STARS.map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-brand-orange fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                ))}
+              </div>
 
+              {/* Quote */}
+              <div className="text-5xl text-brand-orange/20 font-serif leading-none mb-2 select-none">&ldquo;</div>
+              <p className="text-[#D0DDEF] text-lg leading-relaxed mb-8 font-medium">{t.text}</p>
+
+              {/* Author */}
               <div className="flex items-center gap-4">
-                {/* Avatar — pure CSS gradient, no image request */}
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-lg`}>
                   {t.avatar}
                 </div>
                 <div>
                   <p className="text-white font-semibold">{t.name}</p>
-                  <p className="text-indigo-400 text-sm">{t.grade}</p>
+                  <p className="text-brand-orange text-sm font-medium">{t.grade}</p>
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
 
           {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-8">
+          <div className="flex items-center justify-center gap-5 mt-8">
             <button
               onClick={prev}
-              aria-label="Previous testimonial"
-              className="w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              aria-label="Previous"
+              className="w-10 h-10 rounded-xl card-dark border border-white/[0.09] flex items-center justify-center text-[#9BAFC8] hover:text-white hover:border-white/[0.20] transition-all duration-200"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
 
-            {/* Dots */}
             <div className="flex gap-2">
               {TESTIMONIALS.map((_, i) => (
                 <button
@@ -79,7 +108,7 @@ export default function Testimonials() {
                   onClick={() => setActive(i)}
                   aria-label={`Testimonial ${i + 1}`}
                   className={`rounded-full transition-all duration-300 ${
-                    i === active ? 'w-6 h-2 bg-indigo-500' : 'w-2 h-2 bg-slate-600 hover:bg-slate-400'
+                    i === active ? 'w-7 h-2.5 bg-brand-orange shadow-[0_0_8px_rgba(242,116,5,0.60)]' : 'w-2.5 h-2.5 bg-white/20 hover:bg-white/40'
                   }`}
                 />
               ))}
@@ -87,12 +116,10 @@ export default function Testimonials() {
 
             <button
               onClick={next}
-              aria-label="Next testimonial"
-              className="w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              aria-label="Next"
+              className="w-10 h-10 rounded-xl card-dark border border-white/[0.09] flex items-center justify-center text-[#9BAFC8] hover:text-white hover:border-white/[0.20] transition-all duration-200"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </div>
@@ -100,3 +127,5 @@ export default function Testimonials() {
     </section>
   );
 }
+
+

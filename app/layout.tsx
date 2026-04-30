@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body className="bg-dark-bg text-brand-navy antialiased">
+      <body className="bg-[#0F1C30] text-[#F0F4FF] antialiased">
         <div className="page-wrapper">
           <Navbar />
           <main className="flex-1">{children}</main>
