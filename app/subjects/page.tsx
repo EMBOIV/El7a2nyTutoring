@@ -69,11 +69,13 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
             <div className="h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full bg-gradient-to-r ${subject.gradient} transition-all ${
-                  subject.difficulty === 'Foundation'
-                    ? 'w-1/3'
-                    : subject.difficulty === 'Core'
-                      ? 'w-2/3'
-                      : 'w-full'
+                  subject.difficulty === 'OL'
+                    ? 'w-1/4'
+                    : subject.difficulty === 'AS'
+                      ? 'w-2/4'
+                      : subject.difficulty === 'A2'
+                        ? 'w-3/4'
+                        : 'w-full'
                 }`}
               />
             </div>
@@ -95,7 +97,7 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
 
 export default function SubjectsPage() {
   const [selected, setSelected] = useState<Subject | null>(null);
-  const [filter, setFilter] = useState<'All' | 'Foundation' | 'Core' | 'Extended'>('All');
+  const [filter, setFilter] = useState<'All' | 'OL' | 'AS' | 'A2' | 'AL'>('All');
 
   const filtered = filter === 'All' ? subjects : subjects.filter(s => s.difficulty === filter);
 
@@ -119,7 +121,7 @@ export default function SubjectsPage() {
       {/* Filter tabs */}
       <div className="sticky top-[70px] z-30 bg-white/95 backdrop-blur-xl border-b border-[#E2E8F0] py-3">
         <div className="max-w-7xl mx-auto container-pad flex gap-2 overflow-x-auto">
-          {(['All', 'Foundation', 'Core', 'Extended'] as const).map(f => (
+          {(['All', 'OL', 'AS', 'A2', 'AL'] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
