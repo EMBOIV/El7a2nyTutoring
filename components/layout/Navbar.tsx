@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSession, clearSession, getInitials } from '@/lib/auth';
 import type { AppSession } from '@/lib/auth';
+import logoImage from '@/Images/El7a2nyproo1.png';
 
 const NAV_LINKS = [
   { href: '/',         label: 'Home' },
@@ -70,21 +71,17 @@ export default function Navbar() {
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[70px] flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl overflow-hidden border border-[#E2E8F0] shadow-[0_4px_14px_rgba(27,42,68,0.10)] group-hover:shadow-[0_4px_20px_rgba(27,42,68,0.16)] transition-shadow duration-300 bg-white">
+        <Link href="/" className="flex items-center group">
+          <div className="h-10 w-[130px] overflow-hidden group-hover:opacity-90 transition-opacity duration-300 bg-transparent">
             <Image
-              src="/Images/El7a2nyproo1.png"
+              src={logoImage}
               alt="El7a2ny logo"
-              width={36}
-              height={36}
-              className="w-full h-full object-cover"
+              width={260}
+              height={80}
+              className="w-full h-full object-contain mix-blend-multiply"
               priority
             />
           </div>
-          <span className="font-bold text-lg">
-            <span className="text-[#1B2A44]">El7a2ny</span>
-            <span className="text-brand-orange font-semibold text-sm ml-1 hidden sm:inline">Tutoring</span>
-          </span>
         </Link>
 
         {/* Desktop links */}

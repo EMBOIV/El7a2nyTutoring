@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import logoImage from '@/Images/El7a2nyproo1.png';
 
 const FOOTER_LINKS = {
   Platform: [
@@ -62,20 +63,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-14">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl overflow-hidden border border-[#E2E8F0] shadow-[0_4px_14px_rgba(27,42,68,0.10)] bg-white">
+            <div className="flex items-center mb-5">
+              <div className="h-11 w-[145px] overflow-hidden bg-transparent">
                 <Image
-                  src="/Images/El7a2nyproo1.png"
+                  src={logoImage}
                   alt="El7a2ny logo"
-                  width={36}
-                  height={36}
-                  className="w-full h-full object-cover"
+                  width={290}
+                  height={88}
+                  className="w-full h-full object-contain mix-blend-multiply"
                 />
               </div>
-              <span className="font-bold text-lg">
-                <span className="text-[#1B2A44]">El7a2ny</span>
-                <span className="text-brand-orange ml-1 text-sm font-semibold">Tutoring</span>
-              </span>
             </div>
             <p className="text-[#64748B] text-sm leading-relaxed max-w-xs mb-6">
               Expert, personalised IGCSE tutoring that helps motivated students achieve their potential. Proven results, dedicated tutors.
