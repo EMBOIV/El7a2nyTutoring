@@ -44,7 +44,7 @@ function LabeledInput({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-[#9BAFC8] mb-1.5">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium text-[#64748B] mb-1.5">{label}</label>
       <input id={id} type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={type === 'email' ? 'your@email.com' : 'Your full name'}
         className={`input-field ${hasError ? 'border-red-500/60 focus:border-red-500/80' : ''}`} />
@@ -205,24 +205,24 @@ export default function BookingPage() {
               </motion.svg>
               <p className="text-brand-success font-semibold text-lg">Booking request sent successfully ✅</p>
             </div>
-            <p className="text-slate-700 text-sm mb-4">Your session requests have been received. We will contact you shortly.</p>
+            <p className="text-[#334155] text-sm mb-4">Your session requests have been received. We will contact you shortly.</p>
             <div className="rounded-xl bg-white border border-brand-grayMuted p-4 text-sm space-y-1 mb-4">
               <div className="flex justify-between py-1 border-b border-brand-grayMuted">
-                <span className="text-slate-600">Name</span>
+                <span className="text-[#334155]">Name</span>
                 <span className="text-brand-navy font-semibold">{name}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-brand-grayMuted">
-                <span className="text-slate-600">Email</span>
+                <span className="text-[#334155]">Email</span>
                 <span className="text-brand-navy font-semibold">{email}</span>
               </div>
               {selections.map((s, i) => (
                 <div key={s.subject} className={`py-1 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">{s.emoji} {s.subject}</span>
+                    <span className="text-[#334155]">{s.emoji} {s.subject}</span>
                     <span className="text-brand-navy font-semibold">{s.session}</span>
                   </div>
                   <div className="flex justify-end">
-                    <span className="text-xs text-slate-500">{s.examSession}</span>
+                    <span className="text-xs text-[#64748B]">{s.examSession}</span>
                   </div>
                 </div>
               ))}
@@ -240,7 +240,7 @@ export default function BookingPage() {
         <div className="line-grid absolute inset-0 opacity-35 pointer-events-none" />
         <div className="relative z-10 max-w-2xl mx-auto container-pad">
           <div className="mb-4 text-left">
-            <Link href="/subjects" className="inline-flex items-center text-sm text-slate-600 hover:text-brand-orange transition-colors">
+            <Link href="/subjects" className="inline-flex items-center text-sm text-[#64748B] hover:text-brand-orange transition-colors">
               ← Back to Subjects
             </Link>
           </div>
@@ -248,7 +248,7 @@ export default function BookingPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold text-brand-navy mt-3 mb-4">
             IGCSE Booking <span className="gradient-text">in 4 Steps</span>
           </h1>
-          <p className="text-slate-700">Pick one or more subjects, choose a session for each, and submit in under a minute.</p>
+          <p className="text-[#334155]">Pick one or more subjects, choose a session for each, and submit in under a minute.</p>
         </div>
       </section>
 
@@ -263,7 +263,7 @@ export default function BookingPage() {
                   <span className="text-brand-green text-lg">✓</span>
                   <span className="text-sm text-brand-navy">Booking as <strong>{loggedInUser.name}</strong> ({loggedInUser.email})</span>
                 </div>
-                <Link href="/auth" className="text-xs text-slate-500 hover:text-brand-orange underline">Not you?</Link>
+                <Link href="/auth" className="text-xs text-[#64748B] hover:text-brand-orange underline">Not you?</Link>
               </div>
             )}
 
@@ -283,12 +283,12 @@ export default function BookingPage() {
                       className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border transition-colors ${
                         done ? 'bg-brand-green border-brand-green text-white'
                           : active ? 'bg-brand-orange border-brand-orange text-white'
-                          : 'bg-white border-brand-grayMuted text-slate-500'
+                          : 'bg-white border-brand-grayMuted text-[#94A3B8]'
                       }`}
                     >
                       {done ? '✓' : current}
                     </motion.div>
-                    <span className={`text-xs mt-1.5 hidden sm:block ${active ? 'text-brand-navy' : 'text-slate-500'}`}>{label}</span>
+                    <span className={`text-xs mt-1.5 hidden sm:block ${active ? 'text-brand-navy' : 'text-[#94A3B8]'}`}>{label}</span>
                   </div>
                 );
               })}
@@ -312,7 +312,7 @@ export default function BookingPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-slate-600 text-sm mb-5">You can select multiple subjects. Tap a subject to select or deselect it.</p>
+                  <p className="text-[#334155] text-sm mb-5">You can select multiple subjects. Tap a subject to select or deselect it.</p>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {subjects.map((subject) => {
                       const selected = selections.some(s => s.subject === subject.name);
@@ -333,7 +333,7 @@ export default function BookingPage() {
                           )}
                           <span className="text-2xl block mb-2">{subject.emoji}</span>
                           <span className="text-brand-navy text-sm font-semibold block">{subject.name}</span>
-                          <span className="text-slate-600 text-xs">{subject.tagline}</span>
+                          <span className="text-[#334155] text-xs">{subject.tagline}</span>
                         </motion.button>
                       );
                     })}
@@ -354,14 +354,14 @@ export default function BookingPage() {
               {step === 2 && (
                 <motion.div key="session-step" {...stepSlide}>
                   <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Level &amp; Exam Session</h2>
-                  <p className="text-slate-600 text-sm mb-6">Choose your level and target exam session for each subject.</p>
+                  <p className="text-[#334155] text-sm mb-6">Choose your level and target exam session for each subject.</p>
                   <div className="space-y-6">
                     {selections.map(sel => (
                       <div key={sel.subject} className="rounded-xl border border-brand-grayMuted bg-white p-4">
                         <p className="text-brand-navy font-semibold mb-4">{sel.emoji} {sel.subject}</p>
 
                         {/* Level */}
-                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Level</p>
+                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Level</p>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
                           {LEVEL_OPTIONS.map(lvl => {
                             const active = sel.session === lvl;
@@ -377,7 +377,7 @@ export default function BookingPage() {
                                 }`}
                               >
                                 <span className="block">{lvl}</span>
-                                <span className={`text-[10px] font-normal block mt-0.5 ${ active ? 'text-orange-100' : 'text-slate-400' }`}>
+                                <span className={`text-[10px] font-normal block mt-0.5 ${ active ? 'text-orange-100' : 'text-[#94A3B8]' }`}>
                                   {lvl === 'OL' ? 'IGCSE' : lvl === 'AS' ? 'AS Level' : lvl === 'A2' ? 'A2 Level' : 'Full A Level'}
                                 </span>
                               </motion.button>
@@ -386,7 +386,7 @@ export default function BookingPage() {
                         </div>
 
                         {/* Exam session */}
-                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Exam Session</p>
+                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Session</p>
                         <div className="flex flex-wrap gap-2">
                           {EXAM_SESSIONS.map(es => {
                             const active = sel.examSession === es;
@@ -451,21 +451,21 @@ export default function BookingPage() {
                   <h2 className="text-brand-navy font-bold text-xl mb-4">Step 4: Confirmation</h2>
                   <div className="rounded-xl border border-brand-grayMuted bg-white p-5 mb-5 text-sm">
                     <div className="flex justify-between py-2 border-b border-brand-grayMuted">
-                      <span className="text-slate-600">Name</span>
+                      <span className="text-[#334155]">Name</span>
                       <span className="text-brand-navy font-semibold">{loggedInUser?.name ?? info.name}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-brand-grayMuted">
-                      <span className="text-slate-600">Email</span>
+                      <span className="text-[#334155]">Email</span>
                       <span className="text-brand-navy font-semibold">{loggedInUser?.email ?? info.email}</span>
                     </div>
                     {selections.map((s, i) => (
                       <div key={s.subject} className={`py-2 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
                         <div className="flex justify-between">
-                          <span className="text-slate-600">{s.emoji} {s.subject}</span>
+                          <span className="text-[#334155]">{s.emoji} {s.subject}</span>
                           <span className="text-brand-navy font-semibold">{s.session}</span>
                         </div>
                         <div className="flex justify-end mt-0.5">
-                          <span className="text-xs text-slate-500">{s.examSession}</span>
+                          <span className="text-xs text-[#64748B]">{s.examSession}</span>
                         </div>
                       </div>
                     ))}

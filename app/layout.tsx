@@ -32,10 +32,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body className="bg-[#0F1C30] text-[#F0F4FF] antialiased">
+      <body className="bg-white text-[#1B2A44] antialiased">
         <div className="page-wrapper">
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FAFC_55%,#FFFFFF_100%)]">{children}</main>
           <Footer />
         </div>
         {/* Chatbot widget — loaded lazily */}

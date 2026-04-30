@@ -9,7 +9,7 @@ export default function Hero() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-white">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-white border-b border-[#E2E8F0]">
       {/* ── Soft ambient blobs ── */}
       <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Orange blob top-right */}
@@ -56,6 +56,33 @@ export default function Hero() {
 
       {/* ── Content ── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-36 text-center">
+
+        {/* Floating trust cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+          className="hidden lg:block absolute left-4 top-24"
+        >
+          <div className="rounded-2xl bg-white/95 border border-[#E2E8F0] shadow-[0_8px_24px_rgba(27,42,68,0.10)] px-4 py-3 text-left backdrop-blur-sm">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#94A3B8] font-semibold">Student Results</p>
+            <p className="text-2xl font-extrabold text-[#1B2A44] mt-1">95%</p>
+            <p className="text-xs text-[#64748B]">Reached target grades</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          className="hidden lg:block absolute right-4 top-24"
+        >
+          <div className="rounded-2xl bg-white/95 border border-[#E2E8F0] shadow-[0_8px_24px_rgba(27,42,68,0.10)] px-4 py-3 text-left backdrop-blur-sm">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#94A3B8] font-semibold">Families Trust Us</p>
+            <p className="text-2xl font-extrabold text-[#1B2A44] mt-1">500+</p>
+            <p className="text-xs text-[#64748B]">IGCSE students enrolled</p>
+          </div>
+        </motion.div>
 
         {/* Badge */}
         <motion.div

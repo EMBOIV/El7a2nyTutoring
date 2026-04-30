@@ -13,7 +13,7 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B2A44]/20 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div
@@ -21,7 +21,7 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="bg-white rounded-2xl p-8 max-w-lg w-full border border-[#E2E8F0] shadow-[0_12px_40px_rgba(27,42,68,0.14)] max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl p-8 max-w-lg w-full border border-[#E2E8F0] shadow-[0_12px_40px_rgba(27,42,68,0.10)] max-h-[90vh] overflow-y-auto"
           onClick={e => e.stopPropagation()}
         >
           {/* Header */}

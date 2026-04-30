@@ -124,23 +124,26 @@ export default function Navbar() {
         {/* Desktop right */}
         <div className="hidden md:flex items-center gap-2">
           {session ? (
-            <div className="relative group">
-              <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-[#F5F7FA] transition-colors">
-                <AvatarBadge session={session} size="sm" />
-                <div className="leading-tight">
-                  <p className="text-[#1B2A44] text-sm font-medium">{session.name.split(' ')[0]}</p>
-                  {session.role === 'teacher' && (
-                    <p className="text-brand-orange text-[10px] font-semibold uppercase tracking-wider">Teacher</p>
-                  )}
-                </div>
-              </Link>
-              <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-                <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-[0_8px_32px_rgba(27,42,68,0.12)] p-1 min-w-[160px]">
-                  <Link href="/profile" className="block px-3 py-2 text-sm text-[#64748B] hover:text-[#1B2A44] rounded-lg hover:bg-[#F5F7FA]">My Profile</Link>
-                  <button onClick={logout} className="w-full text-left px-3 py-2 text-sm text-[#64748B] hover:text-[#1B2A44] rounded-lg hover:bg-[#F5F7FA]">Logout</button>
+            <>
+              <Link href="/booking" className="btn-primary px-4 py-2 text-xs">Book Your Session</Link>
+              <div className="relative group">
+                <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-[#F5F7FA] transition-colors">
+                  <AvatarBadge session={session} size="sm" />
+                  <div className="leading-tight">
+                    <p className="text-[#1B2A44] text-sm font-medium">{session.name.split(' ')[0]}</p>
+                    {session.role === 'teacher' && (
+                      <p className="text-brand-orange text-[10px] font-semibold uppercase tracking-wider">Teacher</p>
+                    )}
+                  </div>
+                </Link>
+                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
+                  <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-[0_8px_32px_rgba(27,42,68,0.12)] p-1 min-w-[160px]">
+                    <Link href="/profile" className="block px-3 py-2 text-sm text-[#64748B] hover:text-[#1B2A44] rounded-lg hover:bg-[#F5F7FA]">My Profile</Link>
+                    <button onClick={logout} className="w-full text-left px-3 py-2 text-sm text-[#64748B] hover:text-[#1B2A44] rounded-lg hover:bg-[#F5F7FA]">Logout</button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
             <>
               <Link href="/auth" className="px-4 py-2 text-sm font-medium text-[#64748B] hover:text-[#1B2A44] transition-colors duration-200">
@@ -202,6 +205,9 @@ export default function Navbar() {
               <div className="mt-2 pt-2 border-t border-[#E2E8F0]">
                 {session ? (
                   <div className="space-y-1">
+                    <Link href="/booking" className="block px-4 py-3 rounded-xl text-sm font-medium text-white bg-brand-orange hover:bg-brand-orangeSoft transition-colors">
+                      Book Your Session
+                    </Link>
                     <Link href="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#F5F7FA] transition-colors">
                       <AvatarBadge session={session} size="sm" />
                       <div>
