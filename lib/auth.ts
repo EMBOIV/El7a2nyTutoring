@@ -1,6 +1,13 @@
 // ─── Role & auth utilities ────────────────────────────────────────────────────
 
-export const TEACHER_EMAILS: string[] = ['ali.a.embaby@hotmail.com'];
+// Map teacher email → their assigned subjects
+export const TEACHERS: Record<string, { subjects: string[] }> = {
+  'ali.a.embaby@hotmail.com': {
+    subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Human Biology', 'Information Technology', 'Computer Science', 'Accounting', 'Business Studies', 'Economics', 'Combined Science', 'Arabic', 'National Arabic'],
+  },
+};
+
+export const TEACHER_EMAILS: string[] = Object.keys(TEACHERS);
 
 export type UserRole = 'student' | 'teacher';
 
@@ -55,6 +62,10 @@ export interface ReminderEntry {
 export function getRoleForEmail(email: string): UserRole {
   return TEACHER_EMAILS.includes(email.toLowerCase().trim()) ? 'teacher' : 'student';
 }
+
+  export function getTeacherSubjects(email: string): string[] {
+    return TEACHERS[email.toLowerCase().trim()]?.subjects ?? [];
+  }
 
 export function getInitials(name: string): string {
   return name.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
@@ -171,4 +182,37 @@ export function addReminder(entry: ReminderEntry): void {
 export function markReminderRead(id: string): void {
   const all = getReminders().map(r => r.id === id ? { ...r, read: true } : r);
   saveReminders(all);
+}
+
+// ─── Exams ───────────────────────────────────────────────────────────────────
+
+export function getExams(): ExamEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('el7a2ny_exams');
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+export function saveExams(exams: ExamEntry[]): void {
+  localStorage.setItem('el7a2ny_exams', JSON.stringify(exams));
+}
+
+export function addExam(exam: ExamEntry): void {
+  const all = getExams();
+  all.unshift(exam);
+  saveExams(all);
+}
+
+export interface ExamEntry {
+  id: string;
+  teacherEmail: string;
+  studentEmail: string;
+  studentName: string;
+  subject: string;
+  examTitle: string;
+  grade: string;
+  date: string;
+  notes?: string;
+  createdAt: string;
 }

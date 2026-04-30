@@ -125,7 +125,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-2">
           {session ? (
             <>
-              <Link href="/booking" className="btn-primary px-4 py-2 text-xs">Book Your Session</Link>
+              {session.role !== 'teacher' && (
+                <Link href="/booking" className="btn-primary px-4 py-2 text-xs">Book Your Session</Link>
+              )}
               <div className="relative group">
                 <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-[#F5F7FA] transition-colors">
                   <AvatarBadge session={session} size="sm" />
@@ -205,9 +207,11 @@ export default function Navbar() {
               <div className="mt-2 pt-2 border-t border-[#E2E8F0]">
                 {session ? (
                   <div className="space-y-1">
-                    <Link href="/booking" className="block px-4 py-3 rounded-xl text-sm font-medium text-white bg-brand-orange hover:bg-brand-orangeSoft transition-colors">
-                      Book Your Session
-                    </Link>
+                    {session.role !== 'teacher' && (
+                      <Link href="/booking" className="block px-4 py-3 rounded-xl text-sm font-medium text-white bg-brand-orange hover:bg-brand-orangeSoft transition-colors">
+                        Book Your Session
+                      </Link>
+                    )}
                     <Link href="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#F5F7FA] transition-colors">
                       <AvatarBadge session={session} size="sm" />
                       <div>
