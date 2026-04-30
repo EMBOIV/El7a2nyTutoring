@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { getRoleForEmail, getUsers, saveUsers, saveSession, getInitials } from '@/lib/auth';
+import type { AppUser } from '@/lib/auth';
 
 type Tab = 'login' | 'signup';
 
@@ -26,9 +28,7 @@ function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string)
     ev.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    // Check if user exists in localStorage
-    const stored = localStorage.getItem('el7a2ny_users');
-    const users: Array<{ name: string; email: string; password: string }> = stored ? JSON.parse(stored) : [];
+    const users = getUsers();
     const found = users.find(u => u.email === form.email && u.password === form.password);
     await new Promise(r => setTimeout(r, 600));
     setLoading(false);
@@ -36,7 +36,8 @@ function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string)
       setErrors({ password: 'Invalid email or password' });
       return;
     }
-    localStorage.setItem('el7a2ny_session', JSON.stringify({ name: found.name, email: found.email }));
+    const role = getRoleForEmail(found.email);
+    saveSession({ name: found.name, email: found.email, role });
     onSuccess(found.name, found.email);
   };
 
@@ -83,18 +84,17 @@ function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string
     ev.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    // Save user to localStorage
-    const stored = localStorage.getItem('el7a2ny_users');
-    const users: Array<{ name: string; email: string; password: string }> = stored ? JSON.parse(stored) : [];
+    const users = getUsers();
     const exists = users.find(u => u.email === form.email);
     if (exists) {
       setErrors({ email: 'An account with this email already exists' });
       setLoading(false);
       return;
     }
-    users.push({ name: form.name, email: form.email, password: form.password });
-    localStorage.setItem('el7a2ny_users', JSON.stringify(users));
-    localStorage.setItem('el7a2ny_session', JSON.stringify({ name: form.name, email: form.email }));
+    const role = getRoleForEmail(form.email);
+    const newUser: AppUser = { name: form.name, email: form.email, password: form.password, role };
+    saveUsers([...users, newUser]);
+    saveSession({ name: form.name, email: form.email, role });
     // Send welcome email (fire and forget)
     fetch('/api/auth/signup', {
       method: 'POST',

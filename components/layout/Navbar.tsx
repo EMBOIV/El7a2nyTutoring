@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getSession, clearSession, getInitials } from '@/lib/auth';
+import type { AppSession } from '@/lib/auth';
 
 const NAV_LINKS = [
   { href: '/',         label: 'Home' },
@@ -14,8 +16,10 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const pathname    = usePathname();
+  const router      = useRouter();
   const [scrolled, setScrolled]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [session, setSession]       = useState<AppSession | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -24,6 +28,20 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
+
+  // Read session on mount + sync across tabs
+  useEffect(() => {
+    const load = () => setSession(getSession());
+    load();
+    window.addEventListener('storage', load);
+    return () => window.removeEventListener('storage', load);
+  }, []);
+
+  const logout = () => {
+    clearSession();
+    setSession(null);
+    router.push('/');
+  };
 
   return (
     <header
@@ -69,19 +87,54 @@ export default function Navbar() {
               </li>
             );
           })}
+          {session && (
+            <li>
+              <Link
+                href="/dashboard"
+                className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-200 ${
+                  pathname === '/dashboard' ? 'text-white' : 'text-[#9BAFC8] hover:text-white'
+                }`}
+              >
+                {pathname === '/dashboard' && (
+                  <motion.span layoutId="nav-pill" className="absolute inset-0 bg-white/[0.08] rounded-xl border border-white/[0.10]"
+                    transition={{ type: 'spring', bounce: 0.18, duration: 0.4 }} />
+                )}
+                <span className="relative z-10">Dashboard</span>
+              </Link>
+            </li>
+          )}
         </ul>
 
         {/* Desktop right */}
-        <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/auth"
-            className="px-4 py-2 text-sm font-medium text-[#9BAFC8] hover:text-white transition-colors duration-200"
-          >
-            Login
-          </Link>
-          <Link href="/booking" className="btn-primary px-5 py-2.5 text-sm">
-            Book a Session
-          </Link>
+        <div className="hidden md:flex items-center gap-2">
+          {session ? (
+            <>
+              {/* Avatar + name */}
+              <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] transition-colors group">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white text-xs font-bold shadow-[0_2px_8px_rgba(242,116,5,0.40)]">
+                  {getInitials(session.name)}
+                </div>
+                <div className="leading-tight">
+                  <p className="text-white text-sm font-medium">{session.name.split(' ')[0]}</p>
+                  {session.role === 'teacher' && (
+                    <p className="text-brand-orange text-[10px] font-semibold uppercase tracking-wider">Teacher</p>
+                  )}
+                </div>
+              </Link>
+              <button onClick={logout} className="px-3 py-2 text-sm font-medium text-[#9BAFC8] hover:text-white transition-colors rounded-xl hover:bg-white/[0.05]">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth" className="px-4 py-2 text-sm font-medium text-[#9BAFC8] hover:text-white transition-colors duration-200">
+                Login
+              </Link>
+              <Link href="/booking" className="btn-primary px-5 py-2.5 text-sm">
+                Book a Session
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -125,9 +178,33 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-2 pt-2 border-t border-white/[0.07] flex gap-2">
-                <Link href="/auth"    className="flex-1 btn-ghost text-sm py-2.5">Login</Link>
-                <Link href="/booking" className="flex-1 btn-primary text-sm py-2.5">Book Session</Link>
+              {session && (
+                <Link href="/dashboard" className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                  pathname === '/dashboard' ? 'bg-white/[0.08] text-white border border-white/[0.10]' : 'text-[#9BAFC8] hover:text-white hover:bg-white/[0.05]'
+                }`}>Dashboard</Link>
+              )}
+              <div className="mt-2 pt-2 border-t border-white/[0.07]">
+                {session ? (
+                  <div className="space-y-1">
+                    <Link href="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.05] transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white text-xs font-bold">
+                        {getInitials(session.name)}
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium">{session.name}</p>
+                        <p className="text-[#9BAFC8] text-xs capitalize">{session.role}</p>
+                      </div>
+                    </Link>
+                    <button onClick={logout} className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-[#9BAFC8] hover:text-white hover:bg-white/[0.05] transition-colors">
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Link href="/auth"    className="flex-1 btn-ghost text-sm py-2.5">Login</Link>
+                    <Link href="/booking" className="flex-1 btn-primary text-sm py-2.5">Book Session</Link>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

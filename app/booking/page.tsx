@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { subjects } from '@/lib/subjects';
 import { stepSlide } from '@/lib/animations';
+import { addSession } from '@/lib/auth';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
@@ -134,6 +135,24 @@ export default function BookingPage() {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Booking request failed');
+      // Save each subject as a pending session in localStorage
+      const studentEmail = loggedInUser?.email ?? info.email;
+      const studentName = loggedInUser?.name ?? info.name;
+      const today = new Date().toISOString().split('T')[0];
+      selections.forEach(s => {
+        addSession({
+          id: crypto.randomUUID(),
+          studentEmail,
+          studentName,
+          subject: s.subject,
+          date: today,
+          time: '',
+          sessionType: 'Online',
+          status: 'pending',
+          notes: `Session: ${s.session}`,
+          createdAt: new Date().toISOString(),
+        });
+      });
       setSuccess(true);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
