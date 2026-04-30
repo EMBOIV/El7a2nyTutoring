@@ -2,10 +2,27 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { subjects, difficultyColors } from '@/lib/subjects';
-import type { Subject } from '@/lib/subjects';
+import { subjects, LEVEL_INFO, LEVELS } from '@/lib/subjects';
+import type { Subject, Level } from '@/lib/subjects';
 import Link from 'next/link';
 
+/* ── Level pill chip ─────────────────────────────────────────────────────── */
+function LevelPill({ level, active }: { level: Level; active?: boolean }) {
+  const info = LEVEL_INFO[level];
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all ${
+        active
+          ? info.pill.replace('/10', '/20').replace('/50', '') + ' ring-1 ring-current/40 scale-105'
+          : info.pill + ' opacity-70'
+      }`}
+    >
+      {level}
+    </span>
+  );
+}
+
+/* ── Subject modal ───────────────────────────────────────────────────────── */
 function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => void }) {
   return (
     <AnimatePresence>
@@ -32,9 +49,7 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
               </div>
               <div>
                 <h2 className="text-[#1B2A44] font-bold text-xl">{subject.name}</h2>
-                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${difficultyColors[subject.difficulty]}`}>
-                  {subject.difficulty}
-                </span>
+                <p className="text-[#64748B] text-xs mt-0.5">{subject.tagline}</p>
               </div>
             </div>
             <button
@@ -52,32 +67,33 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
             <h3 className="text-[#1B2A44] font-semibold mb-3 text-sm uppercase tracking-wider">Key Topics</h3>
             <div className="grid grid-cols-1 gap-2">
               {subject.topics.map((topic, i) => (
-                <div key={topic} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5">
-                  <span className="text-indigo-400 text-xs font-bold">{String(i + 1).padStart(2, '0')}</span>
+                <div key={topic} className="flex items-center gap-3 bg-[#F5F7FA] rounded-xl px-4 py-2.5 border border-[#E2E8F0]">
+                  <span className="text-brand-orange text-xs font-bold">{String(i + 1).padStart(2, '0')}</span>
                   <span className="text-[#334155] text-sm">{topic}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Difficulty bar */}
+          {/* Level breakdown */}
           <div className="mb-6">
-            <div className="flex justify-between text-xs text-[#94A3B8] mb-2">
-              <span>Difficulty Level</span>
-              <span className={difficultyColors[subject.difficulty].split(' ')[1]}>{subject.difficulty}</span>
-            </div>
-            <div className="h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full bg-gradient-to-r ${subject.gradient} transition-all ${
-                  subject.difficulty === 'OL'
-                    ? 'w-1/4'
-                    : subject.difficulty === 'AS'
-                      ? 'w-2/4'
-                      : subject.difficulty === 'A2'
-                        ? 'w-3/4'
-                        : 'w-full'
-                }`}
-              />
+            <h3 className="text-[#1B2A44] font-semibold mb-3 text-sm uppercase tracking-wider">Available Levels</h3>
+            <div className="space-y-2">
+              {LEVELS.map(lvl => {
+                const info = LEVEL_INFO[lvl];
+                return (
+                  <div key={lvl} className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${info.pill}`}>
+                    <span className="font-black text-sm w-6 shrink-0">{lvl}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold leading-tight">{info.label}</p>
+                      <p className="text-xs opacity-70 leading-tight">{info.description}</p>
+                    </div>
+                    <span className="text-[10px] font-bold whitespace-nowrap bg-white/70 rounded-full px-2 py-0.5 border border-current/20">
+                      {info.difficulty}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -95,11 +111,12 @@ function SubjectModal({ subject, onClose }: { subject: Subject; onClose: () => v
   );
 }
 
+/* ── Page ────────────────────────────────────────────────────────────────── */
 export default function SubjectsPage() {
   const [selected, setSelected] = useState<Subject | null>(null);
-  const [filter, setFilter] = useState<'All' | 'OL' | 'AS' | 'A2' | 'AL'>('All');
+  const [activeLevel, setActiveLevel] = useState<'All' | Level>('All');
 
-  const filtered = filter === 'All' ? subjects : subjects.filter(s => s.difficulty === filter);
+  const activeLevelInfo = activeLevel !== 'All' ? LEVEL_INFO[activeLevel] : null;
 
   return (
     <div className="pt-[70px]">
@@ -108,40 +125,87 @@ export default function SubjectsPage() {
         <div className="line-grid absolute inset-0 opacity-50 pointer-events-none" />
         <div className="orb w-[350px] h-[350px] bg-brand-orange opacity-[0.08] animate-float -top-[15%] left-[60%]" />
         <div className="relative z-10 max-w-3xl mx-auto container-pad">
-            <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Curriculum</span>
+          <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Curriculum</span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-3 mb-5">
             IGCSE <span className="gradient-text">Subjects</span>
           </h1>
           <p className="text-[#64748B] text-lg max-w-xl mx-auto">
-            Choose from 13 expertly taught IGCSE subjects. Click any card to explore the syllabus.
+            All 13 subjects are available at every level — OL, AS, A2, and Full A Level.
+            Click any card to explore topics and levels.
           </p>
         </div>
       </section>
 
-      {/* Filter tabs */}
-      <div className="sticky top-[70px] z-30 bg-white/95 backdrop-blur-xl border-b border-[#E2E8F0] py-3">
-        <div className="max-w-7xl mx-auto container-pad flex gap-2 overflow-x-auto">
-          {(['All', 'OL', 'AS', 'A2', 'AL'] as const).map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                filter === f
-                  ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.35)]'
-                  : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:text-[#1B2A44] hover:border-[#CBD5E1]'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+      {/* Level filter + banner */}
+      <div className="sticky top-[70px] z-30 bg-white/95 backdrop-blur-xl border-b border-[#E2E8F0]">
+        {/* Tabs */}
+        <div className="max-w-7xl mx-auto container-pad pt-3 pb-2 flex gap-2 overflow-x-auto">
+          <button
+            onClick={() => setActiveLevel('All')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+              activeLevel === 'All'
+                ? 'bg-[#1B2A44] text-white'
+                : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:text-[#1B2A44] hover:border-[#CBD5E1]'
+            }`}
+          >
+            All Subjects
+          </button>
+          {LEVELS.map(lvl => {
+            const info = LEVEL_INFO[lvl];
+            const active = activeLevel === lvl;
+            return (
+              <button
+                key={lvl}
+                onClick={() => setActiveLevel(lvl)}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                  active ? info.pill.replace('/10', '/20') + ' shadow-sm' : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]'
+                }`}
+              >
+                <span className="font-black">{lvl}</span>
+                <span className={`ml-1.5 text-xs font-normal hidden sm:inline ${active ? '' : 'text-[#94A3B8]'}`}>
+                  · {info.difficulty}
+                </span>
+              </button>
+            );
+          })}
         </div>
+
+        {/* Level info banner */}
+        <AnimatePresence>
+          {activeLevelInfo && (
+            <motion.div
+              key={activeLevel}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className={`max-w-7xl mx-auto container-pad pb-3`}>
+                <div className={`rounded-xl px-4 py-3 border flex items-center gap-4 ${activeLevelInfo.pill}`}>
+                  {/* Bar */}
+                  <div className="hidden sm:flex flex-col gap-1 w-28 shrink-0">
+                    <div className="h-1.5 w-full bg-white/60 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full bg-gradient-to-r ${activeLevelInfo.bar} ${activeLevelInfo.barWidth}`} />
+                    </div>
+                    <p className="text-[10px] font-semibold opacity-70">{activeLevelInfo.difficulty}</p>
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm">{activeLevel} — {activeLevelInfo.label}</p>
+                    <p className="text-xs opacity-80">{activeLevelInfo.description}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Grid */}
+      {/* Grid — all 13 subjects always shown */}
       <section className="section">
         <div className="max-w-7xl mx-auto container-pad">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {filtered.map(subject => (
+            {subjects.map(subject => (
               <motion.button
                 key={subject.id}
                 layout
@@ -158,14 +222,15 @@ export default function SubjectsPage() {
                   {subject.emoji}
                 </div>
 
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-[#1B2A44] font-semibold text-sm">{subject.name}</h3>
-                  <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${difficultyColors[subject.difficulty]}`}>
-                    {subject.difficulty.slice(0, 3)}
-                  </span>
-                </div>
-
+                <h3 className="text-[#1B2A44] font-semibold text-sm mb-1">{subject.name}</h3>
                 <p className="text-[#64748B] text-xs leading-relaxed mb-4">{subject.tagline}</p>
+
+                {/* All 4 level pills — highlight active filter */}
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {LEVELS.map(lvl => (
+                    <LevelPill key={lvl} level={lvl} active={activeLevel === 'All' || activeLevel === lvl} />
+                  ))}
+                </div>
 
                 <div className="flex items-center justify-between text-xs text-[#94A3B8]">
                   <span>{subject.sessions} sessions</span>
