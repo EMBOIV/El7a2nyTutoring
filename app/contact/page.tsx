@@ -101,10 +101,10 @@ export default function ContactPage() {
         <div className="orb w-[300px] h-[300px] bg-brand-orange opacity-[0.07] animate-float -top-[10%] right-[5%]" />
         <div className="relative z-10 max-w-2xl mx-auto container-pad">
           <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Get in Touch</span>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mt-3 mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-3 mb-4">
             We&apos;d Love to <span className="gradient-text">Hear From You</span>
           </h1>
-          <p className="text-slate-400 text-lg">
+          <p className="text-[#64748B] text-lg">
             Have a question? Want to discuss a study plan? Drop us a message and we&apos;ll reply within 24 hours.
           </p>
         </div>
@@ -116,8 +116,8 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-5 gap-10">
             {/* Info sidebar */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="glass rounded-2xl p-6 border border-white/[0.07]">
-                <h2 className="text-white font-semibold mb-5">Contact Information</h2>
+              <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm">
+                <h2 className="text-[#1B2A44] font-semibold mb-5">Contact Information</h2>
                 <div className="space-y-4">
                   {CONTACT_INFO.map(c => (
                     <a
@@ -129,8 +129,8 @@ export default function ContactPage() {
                         {c.icon}
                       </div>
                       <div>
-                        <p className="text-slate-500 text-xs mb-0.5">{c.label}</p>
-                        <p className="text-slate-200 text-sm group-hover:text-white transition-colors">{c.value}</p>
+                        <p className="text-[#94A3B8] text-xs mb-0.5">{c.label}</p>
+                        <p className="text-[#1B2A44] text-sm group-hover:text-brand-orange transition-colors">{c.value}</p>
                       </div>
                     </a>
                   ))}
@@ -138,26 +138,26 @@ export default function ContactPage() {
               </div>
 
               {/* Map placeholder */}
-              <div id="map" className="glass rounded-2xl overflow-hidden border border-white/[0.07] h-48 flex items-center justify-center">
-                <div className="text-center text-slate-500">
-                  <svg className="w-8 h-8 mx-auto mb-2 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div id="map" className="bg-[#F5F7FA] rounded-2xl overflow-hidden border border-[#E2E8F0] h-48 flex items-center justify-center">
+                <div className="text-center text-[#94A3B8]">
+                  <svg className="w-8 h-8 mx-auto mb-2 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   </svg>
-                  <p className="text-xs">Cairo, Egypt</p>
-                  <p className="text-xs mt-1 text-slate-600">Online sessions available worldwide</p>
+                  <p className="text-xs text-[#64748B]">Cairo, Egypt</p>
+                  <p className="text-xs mt-1 text-[#94A3B8]">Online sessions available worldwide</p>
                 </div>
               </div>
 
               {/* Office hours */}
-              <div className="glass rounded-2xl p-6 border border-white/[0.07]">
-                <h3 className="text-white font-semibold mb-3 text-sm">Office Hours</h3>
+              <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm">
+                <h3 className="text-[#1B2A44] font-semibold mb-3 text-sm">Office Hours</h3>
                 {[
                   ['Sun – Thu', '9:00 AM – 9:00 PM'],
                   ['Fri – Sat', '12:00 PM – 8:00 PM'],
                 ].map(([day, hours]) => (
-                  <div key={day} className="flex justify-between py-2 border-b border-white/[0.05] last:border-0">
-                    <span className="text-slate-400 text-sm">{day}</span>
-                    <span className="text-slate-200 text-sm">{hours}</span>
+                  <div key={day} className="flex justify-between py-2 border-b border-[#E2E8F0] last:border-0">
+                    <span className="text-[#64748B] text-sm">{day}</span>
+                    <span className="text-[#1B2A44] text-sm">{hours}</span>
                   </div>
                 ))}
               </div>
@@ -165,8 +165,8 @@ export default function ContactPage() {
 
             {/* Contact form */}
             <div className="lg:col-span-3">
-              <div className="glass rounded-2xl p-8 border border-white/[0.07]">
-                <h2 className="text-white font-semibold text-xl mb-6">Send a Message</h2>
+              <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm">
+                <h2 className="text-[#1B2A44] font-semibold text-xl mb-6">Send a Message</h2>
 
                 {state.success ? (
                   <motion.div
@@ -177,8 +177,8 @@ export default function ContactPage() {
                     <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-2xl">
                       ✓
                     </div>
-                    <h3 className="text-white font-semibold text-lg mb-2">Message Sent!</h3>
-                    <p className="text-slate-400 text-sm mb-6">We&apos;ll get back to you within 24 hours.</p>
+                    <h3 className="text-[#1B2A44] font-semibold text-lg mb-2">Message Sent!</h3>
+                    <p className="text-[#64748B] text-sm mb-6">We&apos;ll get back to you within 24 hours.</p>
                     <button onClick={() => setState(s => ({ ...s, success: false }))} className="btn-ghost px-6 py-2 text-sm">
                       Send Another
                     </button>
@@ -188,7 +188,7 @@ export default function ContactPage() {
                     <div className="grid sm:grid-cols-2 gap-5">
                       {/* Name */}
                       <div>
-                        <label className="text-slate-300 text-sm font-medium block mb-1.5">Full Name *</label>
+                        <label className="text-[#334155] text-sm font-medium block mb-1.5">Full Name *</label>
                         <input
                           type="text"
                           placeholder="Your name"
@@ -200,7 +200,7 @@ export default function ContactPage() {
 
                       {/* Email */}
                       <div>
-                        <label className="text-slate-300 text-sm font-medium block mb-1.5">Email Address *</label>
+                        <label className="text-[#334155] text-sm font-medium block mb-1.5">Email Address *</label>
                         <input
                           type="email"
                           placeholder="your@email.com"
@@ -213,7 +213,7 @@ export default function ContactPage() {
 
                     {/* Subject */}
                     <div>
-                      <label className="text-slate-300 text-sm font-medium block mb-1.5">Subject *</label>
+                      <label className="text-[#334155] text-sm font-medium block mb-1.5">Subject *</label>
                       <input
                         type="text"
                         placeholder="e.g. Question about IGCSE Maths sessions"
@@ -225,7 +225,7 @@ export default function ContactPage() {
 
                     {/* Message */}
                     <div>
-                      <label className="text-slate-300 text-sm font-medium block mb-1.5">Message *</label>
+                      <label className="text-[#334155] text-sm font-medium block mb-1.5">Message *</label>
                       <textarea
                         rows={5}
                         placeholder="Tell us how we can help..."

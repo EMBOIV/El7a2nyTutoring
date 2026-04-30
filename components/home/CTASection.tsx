@@ -12,15 +12,15 @@ export default function CTASection() {
     <section className="section relative overflow-hidden">
       {/* Background */}
       <div aria-hidden className="absolute inset-0 pointer-events-none">
-        <div className="orb w-[700px] h-[700px] bg-brand-orange opacity-[0.10] -top-40 left-1/2 -translate-x-1/2"
+        <div className="orb w-[700px] h-[700px] bg-brand-orange opacity-[0.06] -top-40 left-1/2 -translate-x-1/2"
           style={reduceMotion ? undefined : { animation: 'orb-drift-a 20s ease-in-out infinite' }}
         />
-        <div className="orb w-[400px] h-[400px] bg-[#7BBF2A] opacity-[0.06] bottom-0 right-0"
+        <div className="orb w-[400px] h-[400px] bg-[#22C55E] opacity-[0.04] bottom-0 right-0"
           style={reduceMotion ? undefined : { animation: 'orb-drift-b 28s ease-in-out infinite' }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(242,116,5,0.08)_0%,transparent_70%)]" />
-        <div className="absolute inset-0 dot-grid opacity-20" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/30 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(242,116,5,0.05)_0%,transparent_70%)]" />
+        <div className="absolute inset-0 dot-grid opacity-50" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-[#E2E8F0]" />
       </div>
 
       <div className="relative z-10 max-w-3xl mx-auto container-pad text-center">
@@ -34,13 +34,13 @@ export default function CTASection() {
             Get Started
           </span>
 
-          <h2 className="text-4xl md:text-6xl font-extrabold text-white mt-4 mb-6 leading-[1.05]">
+          <h2 className="text-4xl md:text-6xl font-extrabold text-[#1B2A44] mt-4 mb-6 leading-[1.05]">
             Ready to Achieve
             <br />
             <span className="gradient-text">Your Best Grade?</span>
           </h2>
 
-          <p className="text-[#9BAFC8] text-xl mb-12 max-w-xl mx-auto leading-relaxed">
+          <p className="text-[#334155] text-xl mb-12 max-w-xl mx-auto leading-relaxed">
             Join 500+ IGCSE students who transformed their grades with El7a2ny.
             Your first session is completely free.
           </p>
@@ -72,7 +72,7 @@ export default function CTASection() {
           {/* Trust strip */}
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
             {TRUST.map((item) => (
-              <span key={item} className="text-[#6B829E] text-sm font-medium">{item}</span>
+              <span key={item} className="text-[#64748B] text-sm font-medium">{item}</span>
             ))}
           </div>
         </motion.div>

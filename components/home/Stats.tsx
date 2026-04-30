@@ -38,9 +38,10 @@ export default function Stats() {
   return (
     <section className="relative py-16 overflow-hidden" ref={ref}>
       {/* divider lines */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent pointer-events-none" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
+      {/* divider lines */}
+      <div className="absolute inset-0 bg-white pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-[#E2E8F0]" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-[#E2E8F0]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -50,14 +51,14 @@ export default function Stats() {
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.55, delay: i * 0.10, ease: [0.22, 1, 0.36, 1] }}
-              className="relative text-center rounded-2xl p-6 card-dark card-dark-hover group"
-              style={{ boxShadow: inView ? `0 0 40px ${stat.glow}` : 'none' }}
+              className="relative text-center rounded-2xl p-6 bg-white border border-[#E2E8F0] shadow-sm card-dark-hover group"
+              style={{ boxShadow: inView ? `0 4px 24px ${stat.glow}` : '0 2px 8px rgba(27,42,68,0.06)' }}
             >
               <div className="text-3xl mb-3">{stat.icon}</div>
               <div className={`text-4xl md:text-5xl font-extrabold mb-2 ${stat.color} tabular-nums`}>
                 <CountUp target={stat.value} suffix={stat.suffix} inView={inView} />
               </div>
-              <p className="text-[#9BAFC8] text-sm font-medium">{stat.label}</p>
+              <p className="text-[#64748B] text-sm font-medium">{stat.label}</p>
             </motion.div>
           ))}
         </div>

@@ -44,13 +44,13 @@ function LoginFormComp({ onSuccess }: { onSuccess: (name: string, email: string)
   return (
     <form onSubmit={submit} noValidate className="space-y-5">
       <div>
-        <label className="text-slate-300 text-sm font-medium block mb-1.5">Email</label>
+        <label className="text-[#334155] text-sm font-medium block mb-1.5">Email</label>
         <input type="email" placeholder="your@email.com" className={`input-field ${errors.email ? 'border-red-500/60' : ''}`}
           value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
         {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
       </div>
       <div>
-        <label className="text-slate-300 text-sm font-medium block mb-1.5">Password</label>
+        <label className="text-[#334155] text-sm font-medium block mb-1.5">Password</label>
         <input type="password" placeholder="••••••••" className={`input-field ${errors.password ? 'border-red-500/60' : ''}`}
           value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
         {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
@@ -115,7 +115,7 @@ function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string
         { key: 'confirm',  label: 'Confirm Password',  type: 'password', ph: '••••••••' },
       ].map(f => (
         <div key={f.key}>
-          <label className="text-slate-300 text-sm font-medium block mb-1.5">{f.label}</label>
+          <label className="text-[#334155] text-sm font-medium block mb-1.5">{f.label}</label>
           <input
             type={f.type}
             placeholder={f.ph}
@@ -150,12 +150,12 @@ export default function AuthPage() {
           className="text-center max-w-sm mx-auto container-pad"
         >
           <div className="text-5xl mb-5">🎓</div>
-          <h2 className="text-white font-bold text-2xl mb-3">
+          <h2 className="text-[#1B2A44] font-bold text-2xl mb-3">
             {tab === 'login' ? `Welcome back, ${successUser.name}!` : 'Account created!'}
           </h2>
-          <p className="text-slate-400 mb-2">You&apos;re now signed in to El7a2ny Tutoring.</p>
+          <p className="text-[#64748B] mb-2">You&apos;re now signed in to El7a2ny Tutoring.</p>
           {tab === 'signup' && (
-            <p className="text-slate-500 text-sm mb-6">A welcome email has been sent to <strong className="text-slate-300">{successUser.email}</strong></p>
+            <p className="text-[#64748B] text-sm mb-6">A welcome email has been sent to <strong className="text-[#1B2A44]">{successUser.email}</strong></p>
           )}
           {tab === 'login' && <div className="mb-8" />}
           <Link href="/dashboard" className="btn-primary px-8 py-3 text-sm inline-flex">Go to Dashboard</Link>
@@ -169,18 +169,18 @@ export default function AuthPage() {
       {/* Left branding panel — hidden on small screens */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center animated-gradient">
         <div className="orb w-[300px] h-[300px] bg-brand-orange opacity-[0.12] animate-float top-[10%] left-[5%]" />
-        <div className="orb w-[240px] h-[240px] bg-brand-navy opacity-80 animate-float-delayed bottom-[10%] right-[5%]" />
+        <div className="orb w-[240px] h-[240px] bg-brand-orange opacity-[0.03] animate-float-delayed bottom-[10%] right-[5%]" />
         <div className="relative z-10 text-center px-12">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center mx-auto mb-6 shadow-[0_8px_24px_rgba(242,116,5,0.40)]">
             <span className="text-white font-black text-2xl">E</span>
           </div>
-          <h2 className="text-white font-extrabold text-3xl mb-4">El7a2ny Tutoring</h2>
-          <p className="text-slate-400 leading-relaxed max-w-xs mx-auto">
+          <h2 className="text-[#1B2A44] font-extrabold text-3xl mb-4">El7a2ny Tutoring</h2>
+          <p className="text-[#64748B] leading-relaxed max-w-xs mx-auto">
             Join 500+ IGCSE students who are unlocking their potential with expert tutoring.
           </p>
           <div className="mt-10 space-y-3">
             {['Personalised sessions', 'Expert Cambridge tutors', '95% success rate', 'Flexible scheduling'].map(f => (
-              <div key={f} className="flex items-center gap-3 text-[#9BAFC8] text-sm">
+              <div key={f} className="flex items-center gap-3 text-[#64748B] text-sm">
                 <span className="w-5 h-5 rounded-full bg-brand-green/20 border border-brand-green/30 flex items-center justify-center text-brand-green text-xs">✓</span>
                 {f}
               </div>
@@ -207,7 +207,7 @@ export default function AuthPage() {
                 key={t}
                 onClick={() => setTab(t)}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  tab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#9BAFC8] hover:text-white'
+                  tab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#64748B] hover:text-[#1B2A44]'
                 }`}
               >
                 {t === 'login' ? 'Sign In' : 'Sign Up'}
@@ -223,9 +223,9 @@ export default function AuthPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: tab === 'login' ? 16 : -16 }}
               transition={{ duration: 0.22 }}
-              className="glass rounded-2xl p-8 border border-white/[0.07]"
+              className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm"
             >
-              <h1 className="text-white font-bold text-xl mb-6">
+              <h1 className="text-[#1B2A44] font-bold text-xl mb-6">
                 {tab === 'login' ? 'Sign in to your account' : 'Create your free account'}
               </h1>
 
@@ -234,7 +234,7 @@ export default function AuthPage() {
                 : <SignupFormComp onSuccess={handleSuccess} />
               }
 
-              <p className="text-center text-slate-500 text-xs mt-5">
+              <p className="text-center text-[#94A3B8] text-xs mt-5">
                 {tab === 'login' ? "Don't have an account? " : 'Already have an account? '}
                 <button onClick={() => setTab(tab === 'login' ? 'signup' : 'login')} className="text-brand-orange hover:text-brand-orangeSoft font-medium">
                   {tab === 'login' ? 'Sign up free' : 'Sign in'}
@@ -243,10 +243,10 @@ export default function AuthPage() {
             </motion.div>
           </AnimatePresence>
 
-          <p className="text-center text-slate-600 text-xs mt-6">
+          <p className="text-center text-[#94A3B8] text-xs mt-6">
             By continuing you agree to our{' '}
-            <a href="#" className="text-slate-500 hover:text-slate-400">Terms</a> &{' '}
-            <a href="#" className="text-slate-500 hover:text-slate-400">Privacy Policy</a>
+            <a href="#" className="text-[#64748B] hover:text-[#1B2A44]">Terms</a> &{' '}
+            <a href="#" className="text-[#64748B] hover:text-[#1B2A44]">Privacy Policy</a>
           </p>
         </div>
       </div>

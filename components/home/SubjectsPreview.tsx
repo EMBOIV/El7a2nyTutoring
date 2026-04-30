@@ -40,30 +40,30 @@ function TiltCard({ title, tagline, emoji, sessions, difficulty }: {
       className="group relative h-full"
     >
       {/* Outer border gradient */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-brand-orange/30 to-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ padding: '1px', borderRadius: '16px' }} />
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-brand-orange/20 to-brand-orange/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ padding: '1px', borderRadius: '16px' }} />
 
-      <div className="relative rounded-2xl card-dark border border-white/[0.08] p-6 h-full flex flex-col group-hover:border-brand-orange/25 transition-all duration-300"
-        style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}
+      <div className="relative rounded-2xl bg-white border border-[#E2E8F0] p-6 h-full flex flex-col group-hover:border-brand-orange/30 group-hover:shadow-[0_8px_32px_rgba(27,42,68,0.10)] transition-all duration-300"
+        style={{ boxShadow: '0 2px 12px rgba(27,42,68,0.06)' }}
       >
         {/* Shine on hover */}
         <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%)' }}
+          style={{ background: 'linear-gradient(135deg, rgba(242,116,5,0.03) 0%, transparent 60%)' }}
         />
 
-        <div className="inline-flex w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-[#0F1C30] border border-white/[0.10] items-center justify-center text-2xl mb-4 relative z-10 shadow-lg">
+        <div className="inline-flex w-12 h-12 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] items-center justify-center text-2xl mb-4 relative z-10 shadow-sm">
           {emoji}
         </div>
 
         <div className="flex items-start justify-between mb-2 relative z-10">
-          <h3 className="text-white font-semibold text-base">{title}</h3>
+          <h3 className="text-[#1B2A44] font-semibold text-base">{title}</h3>
           <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ml-2 flex-shrink-0 ${dc.bg} ${dc.text} ${dc.border}`}>
             {difficulty}
           </span>
         </div>
 
-        <p className="text-[#9BAFC8] text-sm leading-relaxed mb-5 relative z-10 flex-1">{tagline}</p>
+        <p className="text-[#64748B] text-sm leading-relaxed mb-5 relative z-10 flex-1">{tagline}</p>
 
-        <div className="flex items-center justify-between text-xs text-[#6B829E] relative z-10 mt-auto">
+        <div className="flex items-center justify-between text-xs text-[#94A3B8] relative z-10 mt-auto">
           <span>{sessions} sessions</span>
           <span className="text-brand-orange group-hover:translate-x-1.5 transition-transform duration-200 inline-block">
             Learn more →
@@ -78,8 +78,8 @@ export default function SubjectsPreview() {
   return (
     <section className="section relative overflow-hidden">
       <div aria-hidden className="absolute inset-0 pointer-events-none">
-        <div className="orb w-[500px] h-[500px] bg-[#1B2A44] opacity-80 -bottom-40 -right-20" />
-        <div className="absolute inset-0 dot-grid opacity-20" />
+        <div className="orb w-[500px] h-[500px] bg-brand-orange opacity-[0.04] -bottom-40 -right-20" />
+        <div className="absolute inset-0 dot-grid opacity-50" />
       </div>
 
       <div className="max-w-7xl mx-auto container-pad relative z-10">
@@ -93,11 +93,11 @@ export default function SubjectsPreview() {
           <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
             Curriculum
           </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mt-4 mb-5 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-4 mb-5 leading-tight">
             IGCSE Subjects
             <span className="gradient-text"> We Cover</span>
           </h2>
-          <p className="text-[#9BAFC8] max-w-xl mx-auto text-lg">
+          <p className="text-[#64748B] max-w-xl mx-auto text-lg">
             From sciences to humanities — expert tutoring across every major IGCSE subject, tailored to you.
           </p>
         </motion.div>

@@ -9,35 +9,30 @@ export default function Hero() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-[#0F1C30]">
-      {/* ── Animated background orbs ── */}
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-white">
+      {/* ── Soft ambient blobs ── */}
       <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Large teal-navy orb top-left */}
+        {/* Orange blob top-right */}
         <div
-          className="orb w-[700px] h-[700px] bg-[#1B2A44] opacity-90 -top-40 -left-40"
-          style={reduceMotion ? undefined : { animation: 'orb-drift-a 20s ease-in-out infinite' }}
-        />
-        {/* Orange accent orb top-right */}
-        <div
-          className="orb w-[500px] h-[500px] bg-brand-orange opacity-[0.12] -top-20 right-0"
+          className="orb w-[600px] h-[600px] bg-brand-orange opacity-[0.06] -top-20 -right-20"
           style={reduceMotion ? undefined : { animation: 'orb-drift-b 26s ease-in-out infinite' }}
         />
-        {/* Deep navy blob center */}
+        {/* Green blob bottom-left */}
         <div
-          className="orb w-[600px] h-[400px] bg-[#0F1C30] opacity-80 top-1/3 left-1/2 -translate-x-1/2"
+          className="orb w-[500px] h-[500px] bg-[#22C55E] opacity-[0.04] bottom-0 -left-20"
           style={reduceMotion ? undefined : { animation: 'orb-drift-a 30s ease-in-out 6s infinite' }}
         />
-        {/* Subtle orange bottom */}
+        {/* Navy blob center-right */}
         <div
-          className="orb w-[400px] h-[400px] bg-brand-orange opacity-[0.08] bottom-0 left-1/4"
-          style={reduceMotion ? undefined : { animation: 'orb-drift-b 22s ease-in-out 3s infinite' }}
+          className="orb w-[400px] h-[400px] bg-[#1B2A44] opacity-[0.03] top-1/3 right-1/4"
+          style={reduceMotion ? undefined : { animation: 'orb-drift-a 22s ease-in-out 3s infinite' }}
         />
 
         {/* Dot grid overlay */}
-        <div className="absolute inset-0 dot-grid opacity-30" />
+        <div className="absolute inset-0 dot-grid opacity-60" />
 
-        {/* Top radial orange glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(242,116,5,0.13)_0%,transparent_70%)]" />
+        {/* Very soft top orange radial */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(242,116,5,0.06)_0%,transparent_70%)]" />
       </div>
 
       {/* ── Ring decorations ── */}
@@ -67,10 +62,10 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-10 bg-white/[0.06] border border-white/[0.12] backdrop-blur-sm"
+          className="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-10 bg-[#F5F7FA] border border-[#E2E8F0]"
         >
-          <span className="w-2 h-2 bg-brand-green rounded-full animate-pulse" />
-          <span className="text-sm text-[#9BAFC8] font-medium">Now enrolling · Academic Year 2025/2026</span>
+          <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse" />
+          <span className="text-sm text-[#64748B] font-medium">Now enrolling · Academic Year 2025/2026</span>
         </motion.div>
 
         {/* Headline */}
@@ -80,7 +75,7 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-extrabold leading-[1.08] tracking-tight mb-6"
         >
-          <span className="text-white">Unlock Your</span>
+          <span className="text-[#1B2A44]">Unlock Your</span>
           <br />
           <span className="gradient-text">IGCSE Potential</span>
         </motion.h1>
@@ -90,7 +85,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.20, ease: [0.22, 1, 0.36, 1] }}
-          className="text-lg sm:text-xl text-[#9BAFC8] max-w-2xl mx-auto leading-relaxed mb-12"
+          className="text-lg sm:text-xl text-[#334155] max-w-2xl mx-auto leading-relaxed mb-12"
         >
           Premium, personalised tutoring for IGCSE students — with proven strategies,
           expert tutors, and measurable progress every single week.
@@ -134,9 +129,9 @@ export default function Hero() {
           className="flex flex-wrap justify-center gap-x-8 gap-y-3"
         >
           {BADGES.map((item) => (
-            <span key={item} className="flex items-center gap-2 text-sm text-[#9BAFC8]">
-              <span className="w-4 h-4 rounded-full bg-brand-green/20 border border-brand-green/50 flex items-center justify-center">
-                <svg className="w-2.5 h-2.5 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <span key={item} className="flex items-center gap-2 text-sm text-[#64748B]">
+              <span className="w-4 h-4 rounded-full bg-[#22C55E]/15 border border-[#22C55E]/40 flex items-center justify-center">
+                <svg className="w-2.5 h-2.5 text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </span>
@@ -147,10 +142,10 @@ export default function Hero() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-40">
-        <span className="text-xs text-[#9BAFC8] tracking-widest uppercase">Scroll</span>
-        <div className="w-5 h-8 border border-white/40 rounded-full flex justify-center pt-1.5">
-          <div className="w-1 h-2 bg-white rounded-full animate-bounce-slow" />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-30">
+        <span className="text-xs text-[#64748B] tracking-widest uppercase">Scroll</span>
+        <div className="w-5 h-8 border border-[#CBD5E1] rounded-full flex justify-center pt-1.5">
+          <div className="w-1 h-2 bg-[#1B2A44] rounded-full animate-bounce-slow" />
         </div>
       </div>
     </section>

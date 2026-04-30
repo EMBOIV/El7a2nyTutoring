@@ -38,11 +38,11 @@ function Timeline() {
             className="pl-14 relative"
           >
             {/* Dot */}
-            <div className="absolute left-3 top-1.5 w-4 h-4 rounded-full bg-brand-orange border-2 border-[#0F1C30] shadow-[0_0_8px_rgba(242,116,5,0.50)]" />
+            <div className="absolute left-3 top-1.5 w-4 h-4 rounded-full bg-brand-orange border-2 border-[#F5F7FA] shadow-[0_0_8px_rgba(242,116,5,0.30)]" />
 
             <span className="text-brand-orange text-xs font-semibold uppercase tracking-wider">{item.year}</span>
-            <h3 className="text-white font-semibold mt-0.5 mb-1">{item.title}</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+            <h3 className="text-[#1B2A44] font-semibold mt-0.5 mb-1">{item.title}</h3>
+            <p className="text-[#64748B] text-sm leading-relaxed">{item.desc}</p>
           </motion.div>
         ))}
       </div>
@@ -68,11 +68,11 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Our Story</span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white mt-3 mb-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-[#1B2A44] mt-3 mb-6">
               Built for IGCSE.<br />
               <span className="gradient-text">Driven by Results.</span>
             </h1>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-[#64748B] text-lg max-w-2xl mx-auto leading-relaxed">
               El7a2ny was founded by educators who believed that every student deserves access to expert tutoring — not just those who can afford elite schools.
             </p>
           </motion.div>
@@ -80,7 +80,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="section bg-dark-surface/40">
+      <section className="section bg-[#F5F7FA]">
         <div className="max-w-7xl mx-auto container-pad">
           <div className="grid md:grid-cols-2 gap-8">
             {[
@@ -95,8 +95,8 @@ export default function AboutPage() {
                 icon: '🚀',
                 title: 'Our Vision',
                 text: 'To become the leading IGCSE tutoring platform in the MENA region, empowering students to achieve not just good grades, but a genuine love for learning.',
-                gradient: 'from-[#7BBF2A]/15 to-[#7BBF2A]/5',
-                border: 'border-[#7BBF2A]/20',
+                gradient: 'from-[#22C55E]/15 to-[#22C55E]/5',
+                border: 'border-[#22C55E]/20',
               },
             ].map(item => (
               <div
@@ -104,8 +104,8 @@ export default function AboutPage() {
                 className={`glass rounded-2xl p-8 border ${item.border} bg-gradient-to-br ${item.gradient}`}
               >
                 <span className="text-4xl mb-4 block">{item.icon}</span>
-                <h2 className="text-white font-bold text-xl mb-3">{item.title}</h2>
-                <p className="text-slate-400 leading-relaxed">{item.text}</p>
+                <h2 className="text-[#1B2A44] font-bold text-xl mb-3">{item.title}</h2>
+                <p className="text-[#64748B] leading-relaxed">{item.text}</p>
               </div>
             ))}
           </div>
@@ -117,19 +117,19 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto container-pad">
           <div className="text-center mb-14">
             <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Journey</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mt-2">Our Story So Far</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A44] mt-2">Our Story So Far</h2>
           </div>
           <Timeline />
         </div>
       </section>
 
       {/* Team */}
-      <section className="section bg-dark-surface/40">
+      <section className="section bg-[#F5F7FA]">
         <div className="max-w-7xl mx-auto container-pad">
           <div className="text-center mb-14">
             <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">Team</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-4">Meet Our Tutors</h2>
-            <p className="text-slate-400 max-w-xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A44] mt-2 mb-4">Meet Our Tutors</h2>
+            <p className="text-[#64748B] max-w-xl mx-auto">
               Experts who don&apos;t just know their subjects — they know how to teach them.
             </p>
           </div>
@@ -142,18 +142,18 @@ export default function AboutPage() {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, margin: '-60px' }}
-                className="glass rounded-2xl p-6 text-center border border-white/[0.06] hover:border-white/[0.14] transition-all duration-300 hover:-translate-y-1 group"
+                className="bg-white rounded-2xl p-6 text-center border border-[#E2E8F0] hover:border-brand-orange/30 hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
               >
                 {/* Avatar */}
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${member.gradient} flex items-center justify-center text-white font-bold text-lg mx-auto mb-4 shadow-lg`}>
                   {member.initials}
                 </div>
-                <h3 className="text-white font-semibold">{member.name}</h3>
+                <h3 className="text-[#1B2A44] font-semibold">{member.name}</h3>
                 <p className="text-brand-orange text-sm mt-1 mb-3">{member.role}</p>
-                <p className="text-slate-400 text-xs leading-relaxed mb-4">{member.bio}</p>
+                <p className="text-[#64748B] text-xs leading-relaxed mb-4">{member.bio}</p>
                 <div className="flex flex-wrap gap-1.5 justify-center">
                   {member.subjects.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 bg-white/[0.05] rounded-full text-slate-400 border border-white/[0.06]">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 bg-[#F5F7FA] rounded-full text-[#64748B] border border-[#E2E8F0]">{s}</span>
                   ))}
                 </div>
               </motion.div>
@@ -165,8 +165,8 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="section text-center">
         <div className="max-w-2xl mx-auto container-pad">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Learning?</h2>
-          <p className="text-slate-400 mb-8">Book your first free session with one of our tutors today.</p>
+          <h2 className="text-3xl font-bold text-[#1B2A44] mb-4">Ready to Start Learning?</h2>
+          <p className="text-[#64748B] mb-8">Book your first free session with one of our tutors today.</p>
           <Link href="/booking" className="btn-primary px-8 py-4 text-base inline-flex">
             Book a Free Session
           </Link>

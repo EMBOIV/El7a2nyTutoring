@@ -53,9 +53,9 @@ const SOCIALS = [
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/[0.07] bg-[#0A1628]">
+    <footer className="relative border-t border-[#E2E8F0] bg-[#F5F7FA]">
       {/* Top glow line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/30 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-14">
@@ -66,11 +66,11 @@ export default function Footer() {
                 <span className="text-white font-black text-sm">E</span>
               </div>
               <span className="font-bold text-lg">
-                <span className="text-white">El7a2ny</span>
+                <span className="text-[#1B2A44]">El7a2ny</span>
                 <span className="text-brand-orange ml-1 text-sm font-semibold">Tutoring</span>
               </span>
             </div>
-            <p className="text-[#6B829E] text-sm leading-relaxed max-w-xs mb-6">
+            <p className="text-[#64748B] text-sm leading-relaxed max-w-xs mb-6">
               Expert, personalised IGCSE tutoring that helps motivated students achieve their potential. Proven results, dedicated tutors.
             </p>
             <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export default function Footer() {
                   key={s.label}
                   href={s.href}
                   aria-label={s.label}
-                  className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.09] text-[#6B829E] hover:text-brand-orange hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200"
+                  className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] text-[#64748B] hover:text-brand-orange hover:border-brand-orange/30 flex items-center justify-center transition-all duration-200"
                 >
                   {s.icon}
                 </a>
@@ -90,13 +90,13 @@ export default function Footer() {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([title, links]) => (
             <div key={title}>
-              <h3 className="text-white font-semibold text-sm mb-5">{title}</h3>
+              <h3 className="text-[#1B2A44] font-semibold text-sm mb-5">{title}</h3>
               <ul className="space-y-3">
                 {links.map(link => (
                   <li key={link.href + link.label}>
                     <Link
                       href={link.href}
-                      className="text-[#6B829E] hover:text-white text-sm transition-colors duration-200"
+                      className="text-[#64748B] hover:text-[#1B2A44] text-sm transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -108,12 +108,12 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/[0.07] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4A6080]">
+        <div className="pt-8 border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#94A3B8]">
           <p>© {new Date().getFullYear()} El7a2ny Tutoring. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-[#9BAFC8] transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-[#9BAFC8] transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-[#9BAFC8] transition-colors">Cookie Policy</a>
+            <a href="#" className="hover:text-[#1B2A44] transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-[#1B2A44] transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-[#1B2A44] transition-colors">Cookie Policy</a>
           </div>
         </div>
       </div>

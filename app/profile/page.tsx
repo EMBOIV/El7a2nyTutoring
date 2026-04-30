@@ -94,8 +94,8 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  const fc = 'w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 text-white text-sm placeholder-[#6B829E] focus:outline-none focus:border-brand-orange/60 transition-all';
-  const lc = 'block text-[#9BAFC8] text-sm font-medium mb-1.5';
+  const fc = 'w-full bg-white border border-[#E2E8F0] rounded-xl px-4 py-3 text-[#1B2A44] text-sm placeholder-[#94A3B8] focus:outline-none focus:border-brand-orange/60 transition-all';
+  const lc = 'block text-[#334155] text-sm font-medium mb-1.5';
   const previewName = name || session.name;
 
   return (
@@ -103,7 +103,7 @@ export default function ProfilePage() {
       {/* Toast */}
       {toast && (
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A44] border border-brand-orange/30 text-white text-sm px-5 py-3 rounded-2xl shadow-xl">
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white border border-[#E2E8F0] text-[#1B2A44] text-sm px-5 py-3 rounded-2xl shadow-xl">
           {toast}
         </motion.div>
       )}
@@ -117,10 +117,10 @@ export default function ProfilePage() {
               : (selectedAvatar || getInitials(previewName))}
           </div>
           <div>
-            <h1 className="text-white font-bold text-2xl">{session.name}</h1>
+            <h1 className="text-[#1B2A44] font-bold text-2xl">{session.name}</h1>
             <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-[#9BAFC8] text-sm">{session.email}</p>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${session.role === 'teacher' ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/30' : 'bg-white/[0.06] text-[#9BAFC8] border border-white/[0.10]'}`}>
+              <p className="text-[#64748B] text-sm">{session.email}</p>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${session.role === 'teacher' ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/30' : 'bg-[#F5F7FA] text-[#64748B] border border-[#E2E8F0]'}`}>
                 {session.role}
               </span>
             </div>
@@ -128,18 +128,18 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="glass rounded-2xl p-1.5 inline-flex gap-1 mb-8">
+        <div className="bg-[#F5F7FA] rounded-2xl p-1.5 inline-flex gap-1 mb-8 border border-[#E2E8F0]">
           {(['account', 'password'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-5 py-2 rounded-xl text-sm font-medium capitalize transition-all ${
-                tab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#9BAFC8] hover:text-white'
+                tab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#64748B] hover:text-[#1B2A44]'
               }`}
             >{t === 'account' ? 'Account Info' : 'Change Password'}</button>
           ))}
         </div>
 
         {tab === 'account' && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-8 border border-white/[0.07] space-y-6">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
             <div>
               <label className={lc}>Full Name</label>
               <input type="text" value={name} onChange={e => setName(e.target.value)} className={fc} />
@@ -148,7 +148,7 @@ export default function ProfilePage() {
             <div>
               <label className={lc}>Email Address</label>
               <input type="email" value={session.email} disabled className={`${fc} opacity-50 cursor-not-allowed`} />
-              <p className="text-[#6B829E] text-xs mt-1.5">Email cannot be changed.</p>
+              <p className="text-[#94A3B8] text-xs mt-1.5">Email cannot be changed.</p>
             </div>
 
             <div>
@@ -157,7 +157,7 @@ export default function ProfilePage() {
                 <button
                   onClick={() => setSelectedAvatar('')}
                   className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold border transition-all ${
-                    !selectedAvatar ? 'border-brand-orange bg-brand-orange/15 text-brand-orange' : 'border-white/[0.10] bg-white/[0.04] text-[#9BAFC8]'
+                    !selectedAvatar ? 'border-brand-orange bg-brand-orange/15 text-brand-orange' : 'border-[#E2E8F0] bg-[#F5F7FA] text-[#64748B]'
                   }`}
                 >
                   {getInitials(previewName)}
@@ -165,7 +165,7 @@ export default function ProfilePage() {
                 {AVATARS.map(e => (
                   <button key={e} onClick={() => setSelectedAvatar(e)}
                     className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border transition-all ${
-                      selectedAvatar === e ? 'border-brand-orange bg-brand-orange/15 scale-110' : 'border-white/[0.10] bg-white/[0.04] hover:border-white/[0.25]'
+                      selectedAvatar === e ? 'border-brand-orange bg-brand-orange/15 scale-110' : 'border-[#E2E8F0] bg-[#F5F7FA] hover:border-[#CBD5E1]'
                     }`}
                   >{e}</button>
                 ))}
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                   <input type="file" accept="image/*" className="hidden" onChange={onUploadPhoto} />
                 </label>
                 {selectedAvatar?.startsWith('data:image') && (
-                  <button onClick={() => setSelectedAvatar('')} className="text-xs text-[#9BAFC8] hover:text-white underline">
+                  <button onClick={() => setSelectedAvatar('')} className="text-xs text-[#64748B] hover:text-[#1B2A44] underline">
                     Remove photo
                   </button>
                 )}
@@ -189,8 +189,8 @@ export default function ProfilePage() {
             </div>
 
             {/* Danger zone */}
-            <div className="pt-4 border-t border-white/[0.07]">
-              <p className="text-[#6B829E] text-xs mb-3 font-semibold uppercase tracking-wider">Danger Zone</p>
+            <div className="pt-4 border-t border-[#E2E8F0]">
+              <p className="text-[#94A3B8] text-xs mb-3 font-semibold uppercase tracking-wider">Danger Zone</p>
               <button onClick={deleteAccount} className="px-5 py-2.5 text-sm font-medium text-red-400 border border-red-500/25 rounded-xl hover:bg-red-500/10 transition-colors">
                 Delete Account
               </button>
@@ -199,7 +199,7 @@ export default function ProfilePage() {
         )}
 
         {tab === 'password' && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-8 border border-white/[0.07] space-y-5">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-5">
             {[
               { key: 'current', label: 'Current Password', ph: '••••••••' },
               { key: 'next', label: 'New Password', ph: 'At least 8 characters' },

@@ -20,7 +20,7 @@ const PROGRESS_COLORS = ['from-brand-orange to-brand-orangeSoft', 'from-[#7BBF2A
 function Avatar({ name, avatar, size = 'md' }: { name: string; avatar?: string; size?: 'sm' | 'md' | 'lg' }) {
   const sz = size === 'sm' ? 'w-8 h-8 text-xs' : size === 'lg' ? 'w-14 h-14 text-lg' : 'w-10 h-10 text-sm';
   if (avatar?.startsWith('data:image')) {
-    return <img src={avatar} alt={name} className={`${sz} rounded-full object-cover border border-white/[0.14] flex-shrink-0`} />;
+    return <img src={avatar} alt={name} className={`${sz} rounded-full object-cover border border-[#E2E8F0] flex-shrink-0`} />;
   }
   return (
     <div className={`${sz} rounded-full bg-gradient-to-br from-brand-orange to-brand-orangeSoft flex items-center justify-center text-white font-bold shadow-[0_2px_8px_rgba(242,116,5,0.35)] flex-shrink-0`}>
@@ -33,7 +33,7 @@ function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="text-center py-14">
       <div className="text-4xl mb-3">{icon}</div>
-      <p className="text-[#6B829E] text-sm">{text}</p>
+      <p className="text-[#94A3B8] text-sm">{text}</p>
     </div>
   );
 }
@@ -57,7 +57,7 @@ function StudentDashboard({ session }: { session: AppSession }) {
   const unread = myReminders.filter(r => !r.read).length;
 
   const statusColor = (s: SessionEntry['status']) =>
-    s === 'confirmed' ? 'text-[#7BBF2A] bg-[#7BBF2A]/10 border-[#7BBF2A]/25' :
+    s === 'confirmed' ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/25' :
     s === 'completed' ? 'text-[#A5C8FF] bg-[#A5C8FF]/10 border-[#A5C8FF]/25' :
     s === 'cancelled' ? 'text-red-400 bg-red-500/10 border-red-500/20' :
     'text-[#FFD166] bg-[#FFD166]/10 border-[#FFD166]/25';
@@ -68,9 +68,9 @@ function StudentDashboard({ session }: { session: AppSession }) {
         <div className="flex items-center gap-4">
           <Avatar name={session.name} avatar={session.avatar} size="lg" />
           <div>
-            <p className="text-[#9BAFC8] text-sm">Welcome back 👋</p>
-            <h1 className="text-white font-bold text-2xl mt-0.5">{session.name}</h1>
-            <p className="text-[#6B829E] text-xs mt-0.5">{session.email}</p>
+            <p className="text-[#64748B] text-sm">Welcome back 👋</p>
+            <h1 className="text-[#1B2A44] font-bold text-2xl mt-0.5">{session.name}</h1>
+            <p className="text-[#94A3B8] text-xs mt-0.5">{session.email}</p>
           </div>
         </div>
         <Link href="/booking" className="btn-primary px-5 py-2.5 text-sm">+ Book Session</Link>
@@ -80,22 +80,22 @@ function StudentDashboard({ session }: { session: AppSession }) {
         {[
           { label: 'Sessions', value: mySessions.length, icon: '📚', color: 'text-brand-orange' },
           { label: 'Subjects Tracked', value: myProgress.length, icon: '📊', color: 'text-[#A5C8FF]' },
-          { label: 'Avg Progress', value: myProgress.length ? Math.round(myProgress.reduce((a, b) => a + b.progress, 0) / myProgress.length) + '%' : '—', icon: '🎯', color: 'text-[#7BBF2A]' },
-          { label: 'Reminders', value: unread > 0 ? `${unread} new` : myReminders.length, icon: '🔔', color: unread > 0 ? 'text-[#FFD166]' : 'text-[#9BAFC8]' },
+          { label: 'Avg Progress', value: myProgress.length ? Math.round(myProgress.reduce((a, b) => a + b.progress, 0) / myProgress.length) + '%' : '—', icon: '🎯', color: 'text-[#22C55E]' },
+          { label: 'Reminders', value: unread > 0 ? `${unread} new` : myReminders.length, icon: '🔔', color: unread > 0 ? 'text-[#FFD166]' : 'text-[#64748B]' },
         ].map(s => (
-          <div key={s.label} className="glass rounded-2xl p-5 border border-white/[0.06]">
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm">
             <span className="text-2xl block mb-2">{s.icon}</span>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-[#6B829E] text-xs mt-1">{s.label}</p>
+            <p className="text-[#94A3B8] text-xs mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="glass rounded-2xl p-1.5 inline-flex gap-1 mb-8 flex-wrap">
+      <div className="bg-[#F5F7FA] rounded-2xl p-1.5 inline-flex gap-1 mb-8 flex-wrap border border-[#E2E8F0]">
         {(['overview', 'sessions', 'progress', 'reminders'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-xl text-sm font-medium capitalize transition-all relative ${
-              tab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#9BAFC8] hover:text-white'
+              tab === t ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#64748B] hover:text-[#1B2A44]'
             }`}
           >
             {t}
@@ -111,17 +111,17 @@ function StudentDashboard({ session }: { session: AppSession }) {
           <motion.div key="ov" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-white font-semibold mb-3">Recent Sessions</h2>
+                <h2 className="text-[#1B2A44] font-semibold mb-3">Recent Sessions</h2>
                 {mySessions.length === 0
                   ? <EmptyState icon="📅" text="No sessions yet. Book one!" />
                   : mySessions.slice(0, 3).map(s => (
-                    <div key={s.id} className="glass rounded-2xl p-4 border border-white/[0.06] flex items-center gap-4 mb-3">
+                    <div key={s.id} className="bg-white rounded-2xl p-4 border border-[#E2E8F0] flex items-center gap-4 mb-3 shadow-sm">
                       <div className="w-10 h-10 rounded-xl bg-brand-orange/15 border border-brand-orange/20 flex items-center justify-center text-brand-orange font-bold flex-shrink-0">
                         {s.subject.slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium text-sm">{s.subject}</p>
-                        <p className="text-[#9BAFC8] text-xs">{s.date}{s.time && ` · ${s.time}`}</p>
+                        <p className="text-[#1B2A44] font-medium text-sm">{s.subject}</p>
+                        <p className="text-[#64748B] text-xs">{s.date}{s.time && ` · ${s.time}`}</p>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${statusColor(s.status)}`}>{s.status}</span>
                     </div>
@@ -129,16 +129,16 @@ function StudentDashboard({ session }: { session: AppSession }) {
                 }
               </div>
               <div>
-                <h2 className="text-white font-semibold mb-3">Progress Overview</h2>
+                <h2 className="text-[#1B2A44] font-semibold mb-3">Progress Overview</h2>
                 {myProgress.length === 0
                   ? <EmptyState icon="📈" text="Progress will appear once your teacher updates it." />
                   : myProgress.slice(0, 4).map((p, i) => (
                     <div key={p.subject} className="mb-4">
                       <div className="flex justify-between mb-1.5">
-                        <span className="text-white text-sm font-medium">{p.subject}</span>
-                        <span className="text-[#9BAFC8] text-sm">{p.progress}%{p.grade && ` · ${p.grade}`}</span>
+                        <span className="text-[#1B2A44] text-sm font-medium">{p.subject}</span>
+                        <span className="text-[#64748B] text-sm">{p.progress}%{p.grade && ` · ${p.grade}`}</span>
                       </div>
-                      <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
                         <motion.div initial={{ width: 0 }} animate={{ width: `${p.progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 }}
                           className={`h-full rounded-full bg-gradient-to-r ${PROGRESS_COLORS[i % PROGRESS_COLORS.length]}`} />
                       </div>
@@ -152,19 +152,19 @@ function StudentDashboard({ session }: { session: AppSession }) {
 
         {tab === 'sessions' && (
           <motion.div key="sess" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <h2 className="text-white font-semibold mb-4">My Sessions</h2>
+            <h2 className="text-[#1B2A44] font-semibold mb-4">My Sessions</h2>
             {mySessions.length === 0
               ? <EmptyState icon="📅" text="No sessions assigned yet." />
               : <div className="space-y-3">
                 {mySessions.map(s => (
-                  <div key={s.id} className="glass rounded-2xl p-5 border border-white/[0.06] flex flex-wrap items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div key={s.id} className="bg-white rounded-2xl p-5 border border-[#E2E8F0] flex flex-wrap items-center gap-4 shadow-sm">
+                      <div className="w-12 h-12 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-[#1B2A44] font-bold flex-shrink-0">
                       {s.subject.slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold">{s.subject}</p>
-                      <p className="text-[#9BAFC8] text-sm">{s.date}{s.time && ` · ${s.time}`} · {s.sessionType}</p>
-                      {s.notes && <p className="text-[#6B829E] text-xs mt-1 italic">{s.notes}</p>}
+                      <p className="text-[#1B2A44] font-semibold">{s.subject}</p>
+                      <p className="text-[#64748B] text-sm">{s.date}{s.time && ` · ${s.time}`} · {s.sessionType}</p>
+                      {s.notes && <p className="text-[#94A3B8] text-xs mt-1 italic">{s.notes}</p>}
                     </div>
                     <span className={`text-xs px-2.5 py-1 rounded-full border capitalize ${statusColor(s.status)}`}>{s.status}</span>
                   </div>
@@ -176,25 +176,25 @@ function StudentDashboard({ session }: { session: AppSession }) {
 
         {tab === 'progress' && (
           <motion.div key="prog" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <h2 className="text-white font-semibold mb-6">Subject Progress</h2>
+            <h2 className="text-[#1B2A44] font-semibold mb-6">Subject Progress</h2>
             {myProgress.length === 0
               ? <EmptyState icon="📊" text="Your teacher hasn't set progress yet." />
               : <div className="grid sm:grid-cols-2 gap-5">
                 {myProgress.map((p, i) => (
-                  <div key={p.subject} className="glass rounded-2xl p-6 border border-white/[0.06]">
+                  <div key={p.subject} className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm">
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-white font-medium">{p.subject}</span>
+                      <span className="text-[#1B2A44] font-medium">{p.subject}</span>
                       <div className="text-right">
-                        <span className="text-white font-bold">{p.progress}%</span>
+                        <span className="text-[#1B2A44] font-bold">{p.progress}%</span>
                         {p.grade && <span className="ml-2 text-brand-orange text-sm font-semibold">{p.grade}</span>}
                       </div>
                     </div>
-                    <div className="h-2.5 bg-white/[0.06] rounded-full overflow-hidden mb-2">
+                    <div className="h-2.5 bg-[#E2E8F0] rounded-full overflow-hidden mb-2">
                       <motion.div initial={{ width: 0 }} animate={{ width: `${p.progress}%` }} transition={{ duration: 0.8 }}
                         className={`h-full rounded-full bg-gradient-to-r ${PROGRESS_COLORS[i % PROGRESS_COLORS.length]}`} />
                     </div>
-                    {p.notes && <p className="text-[#9BAFC8] text-xs mt-2 italic">{p.notes}</p>}
-                    <p className="text-[#6B829E] text-xs mt-1">Updated {new Date(p.updatedAt).toLocaleDateString()}</p>
+                    {p.notes && <p className="text-[#64748B] text-xs mt-2 italic">{p.notes}</p>}
+                    <p className="text-[#94A3B8] text-xs mt-1">Updated {new Date(p.updatedAt).toLocaleDateString()}</p>
                   </div>
                 ))}
               </div>
@@ -204,23 +204,23 @@ function StudentDashboard({ session }: { session: AppSession }) {
 
         {tab === 'reminders' && (
           <motion.div key="rem" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <h2 className="text-white font-semibold mb-4">Reminders from Teacher</h2>
+            <h2 className="text-[#1B2A44] font-semibold mb-4">Reminders from Teacher</h2>
             {myReminders.length === 0
               ? <EmptyState icon="🔔" text="No reminders yet." />
               : <div className="space-y-3">
                 {myReminders.map(r => (
-                  <div key={r.id} className={`glass rounded-2xl p-5 border transition-all ${r.read ? 'border-white/[0.05]' : 'border-[#FFD166]/30 bg-[#FFD166]/[0.03]'}`}>
+                  <div key={r.id} className={`bg-white rounded-2xl p-5 border transition-all shadow-sm ${r.read ? 'border-[#E2E8F0]' : 'border-[#FFD166]/30 bg-[#FFF7E8]'}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-white text-sm font-medium">{r.teacherName}</span>
+                          <span className="text-[#1B2A44] text-sm font-medium">{r.teacherName}</span>
                           {!r.read && <span className="text-[9px] bg-[#FFD166] text-[#0F1C30] px-1.5 py-0.5 rounded-full font-bold uppercase">New</span>}
                         </div>
-                        <p className="text-[#9BAFC8] text-sm leading-relaxed">{r.message}</p>
-                        <p className="text-[#6B829E] text-xs mt-2">{new Date(r.sentAt).toLocaleString()}</p>
+                        <p className="text-[#64748B] text-sm leading-relaxed">{r.message}</p>
+                        <p className="text-[#94A3B8] text-xs mt-2">{new Date(r.sentAt).toLocaleString()}</p>
                       </div>
                       {!r.read && (
-                        <button onClick={() => { markReminderRead(r.id); reload(); }} className="text-xs text-[#9BAFC8] hover:text-white px-2 py-1 rounded-lg hover:bg-white/[0.05] transition-colors flex-shrink-0">
+                        <button onClick={() => { markReminderRead(r.id); reload(); }} className="text-xs text-[#64748B] hover:text-[#1B2A44] px-2 py-1 rounded-lg hover:bg-[#F5F7FA] transition-colors flex-shrink-0">
                           Mark read
                         </button>
                       )}
@@ -281,9 +281,9 @@ function TeacherDashboard({ session }: { session: AppSession }) {
     setRf({ studentEmail: '', message: '' }); showToast('Reminder sent ✓');
   };
 
-  const fc = 'w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 text-white text-sm placeholder-[#6B829E] focus:outline-none focus:border-brand-orange/60 transition-all';
-  const lc = 'block text-[#9BAFC8] text-sm font-medium mb-1.5';
-  const ss = { background: '#1B2A44' };
+  const fc = 'w-full bg-white border border-[#E2E8F0] rounded-xl px-4 py-3 text-[#1B2A44] text-sm placeholder-[#94A3B8] focus:outline-none focus:border-brand-orange/60 transition-all';
+  const lc = 'block text-[#334155] text-sm font-medium mb-1.5';
+  const ss = { background: '#FFFFFF', color: '#1B2A44' };
 
   const StudentSelect = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
     <select value={value} onChange={e => onChange(e.target.value)} className={fc} style={ss}>
@@ -297,7 +297,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A44] border border-brand-orange/30 text-white text-sm px-5 py-3 rounded-2xl shadow-xl">
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white border border-[#E2E8F0] text-[#1B2A44] text-sm px-5 py-3 rounded-2xl shadow-xl">
             {toast}
           </motion.div>
         )}
@@ -307,10 +307,10 @@ function TeacherDashboard({ session }: { session: AppSession }) {
         <Avatar name={session.name} avatar={session.avatar} size="lg" />
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-white font-bold text-2xl">{session.name}</h1>
+            <h1 className="text-[#1B2A44] font-bold text-2xl">{session.name}</h1>
             <span className="text-xs bg-brand-orange text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Teacher</span>
           </div>
-          <p className="text-[#9BAFC8] text-sm mt-0.5">{students.length} students · {allSessions.length} sessions</p>
+          <p className="text-[#64748B] text-sm mt-0.5">{students.length} students · {allSessions.length} sessions</p>
         </div>
       </div>
 
@@ -318,21 +318,21 @@ function TeacherDashboard({ session }: { session: AppSession }) {
         {[
           { label: 'Students', value: students.length, icon: '👨‍🎓', color: 'text-brand-orange' },
           { label: 'Total Sessions', value: allSessions.length, icon: '📅', color: 'text-[#A5C8FF]' },
-          { label: 'Progress Records', value: allProgress.length, icon: '📊', color: 'text-[#7BBF2A]' },
+          { label: 'Progress Records', value: allProgress.length, icon: '📊', color: 'text-[#22C55E]' },
           { label: 'Confirmed', value: allSessions.filter(s => s.status === 'confirmed').length, icon: '⏰', color: 'text-[#FFD166]' },
         ].map(s => (
-          <div key={s.label} className="glass rounded-2xl p-5 border border-white/[0.06]">
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm">
             <span className="text-2xl block mb-2">{s.icon}</span>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-[#6B829E] text-xs mt-1">{s.label}</p>
+            <p className="text-[#94A3B8] text-xs mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="glass rounded-2xl p-1.5 inline-flex gap-1 mb-8 flex-wrap">
+      <div className="bg-[#F5F7FA] rounded-2xl p-1.5 inline-flex gap-1 mb-8 flex-wrap border border-[#E2E8F0]">
         {([{ key: 'students', label: 'Students' }, { key: 'add-session', label: 'Add Session' }, { key: 'progress', label: 'Set Progress' }, { key: 'reminders', label: 'Send Reminder' }] as const).map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${tab === t.key ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#9BAFC8] hover:text-white'}`}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${tab === t.key ? 'bg-brand-orange text-white shadow-[0_4px_14px_rgba(242,116,5,0.30)]' : 'text-[#64748B] hover:text-[#1B2A44]'}`}
           >{t.label}</button>
         ))}
       </div>
@@ -340,7 +340,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
       <AnimatePresence mode="wait">
         {tab === 'students' && (
           <motion.div key="students" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <h2 className="text-white font-semibold mb-4">All Students ({students.length})</h2>
+            <h2 className="text-[#1B2A44] font-semibold mb-4">All Students ({students.length})</h2>
             {students.length === 0
               ? <EmptyState icon="👨‍🎓" text="No students registered yet." />
               : <div className="space-y-3">
@@ -349,15 +349,15 @@ function TeacherDashboard({ session }: { session: AppSession }) {
                   const sp = allProgress.filter(x => x.studentEmail === s.email);
                   const avg = sp.length ? Math.round(sp.reduce((a, b) => a + b.progress, 0) / sp.length) : null;
                   return (
-                    <div key={s.email} className="glass rounded-2xl p-5 border border-white/[0.06] flex flex-wrap items-center gap-4">
+                    <div key={s.email} className="bg-white rounded-2xl p-5 border border-[#E2E8F0] flex flex-wrap items-center gap-4 shadow-sm">
                       <Avatar name={s.name} avatar={s.avatar} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold">{s.name}</p>
-                        <p className="text-[#9BAFC8] text-xs">{s.email}</p>
+                        <p className="text-[#1B2A44] font-semibold">{s.name}</p>
+                        <p className="text-[#64748B] text-xs">{s.email}</p>
                       </div>
                       <div className="flex gap-4 text-center">
-                        <div><p className="text-brand-orange font-bold">{ss2.length}</p><p className="text-[#6B829E] text-xs">sessions</p></div>
-                        <div><p className="text-[#7BBF2A] font-bold">{avg !== null ? `${avg}%` : '—'}</p><p className="text-[#6B829E] text-xs">avg</p></div>
+                        <div><p className="text-brand-orange font-bold">{ss2.length}</p><p className="text-[#94A3B8] text-xs">sessions</p></div>
+                        <div><p className="text-[#22C55E] font-bold">{avg !== null ? `${avg}%` : '—'}</p><p className="text-[#94A3B8] text-xs">avg</p></div>
                       </div>
                     </div>
                   );
@@ -366,17 +366,17 @@ function TeacherDashboard({ session }: { session: AppSession }) {
             }
             {allSessions.length > 0 && (
               <>
-                <h2 className="text-white font-semibold mt-8 mb-4">All Sessions</h2>
+                <h2 className="text-[#1B2A44] font-semibold mt-8 mb-4">All Sessions</h2>
                 <div className="space-y-3">
                   {allSessions.map(s => (
-                    <div key={s.id} className="glass rounded-2xl p-4 border border-white/[0.06] flex flex-wrap items-center gap-4">
+                    <div key={s.id} className="bg-white rounded-2xl p-4 border border-[#E2E8F0] flex flex-wrap items-center gap-4 shadow-sm">
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium text-sm">{s.studentName} — {s.subject}</p>
-                        <p className="text-[#9BAFC8] text-xs">{s.date}{s.time && ` · ${s.time}`} · {s.sessionType}</p>
-                        {s.notes && <p className="text-[#6B829E] text-xs italic mt-0.5">{s.notes}</p>}
+                        <p className="text-[#1B2A44] font-medium text-sm">{s.studentName} — {s.subject}</p>
+                        <p className="text-[#64748B] text-xs">{s.date}{s.time && ` · ${s.time}`} · {s.sessionType}</p>
+                        {s.notes && <p className="text-[#94A3B8] text-xs italic mt-0.5">{s.notes}</p>}
                       </div>
                       <select value={s.status} onChange={e => { const updated = allSessions.map(x => x.id === s.id ? { ...x, status: e.target.value as SessionEntry['status'] } : x); saveSessions(updated); reload(); }}
-                        className="text-xs px-2 py-1 rounded-lg border border-white/[0.10] text-white focus:outline-none capitalize" style={ss}>
+                        className="text-xs px-2 py-1 rounded-lg border border-[#E2E8F0] text-[#1B2A44] focus:outline-none capitalize bg-white" style={ss}>
                         {(['pending', 'confirmed', 'completed', 'cancelled'] as const).map(st => <option key={st} value={st}>{st}</option>)}
                       </select>
                     </div>
@@ -390,7 +390,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
         {tab === 'add-session' && (
           <motion.div key="add" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="max-w-lg">
-              <h2 className="text-white font-semibold mb-6">Schedule a Session</h2>
+              <h2 className="text-[#1B2A44] font-semibold mb-6">Schedule a Session</h2>
               <div className="space-y-4">
                 <div><label className={lc}>Student *</label><StudentSelect value={sf.studentEmail} onChange={v => setSf(p => ({ ...p, studentEmail: v }))} /></div>
                 <div><label className={lc}>Subject *</label>
@@ -425,7 +425,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
         {tab === 'progress' && (
           <motion.div key="prog" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="max-w-lg">
-              <h2 className="text-white font-semibold mb-6">Update Student Progress</h2>
+              <h2 className="text-[#1B2A44] font-semibold mb-6">Update Student Progress</h2>
               <div className="space-y-4">
                 <div><label className={lc}>Student *</label><StudentSelect value={pf.studentEmail} onChange={v => setPf(p => ({ ...p, studentEmail: v }))} /></div>
                 <div><label className={lc}>Subject *</label>
@@ -437,7 +437,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
                 <div>
                   <label className={lc}>Progress: {pf.progress}%</label>
                   <input type="range" min={0} max={100} value={pf.progress} onChange={e => setPf(p => ({ ...p, progress: +e.target.value }))} className="w-full accent-brand-orange" />
-                  <div className="flex justify-between text-[#6B829E] text-xs mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
+                  <div className="flex justify-between text-[#94A3B8] text-xs mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
                 </div>
                 <div><label className={lc}>Grade (optional)</label><input type="text" value={pf.grade} onChange={e => setPf(p => ({ ...p, grade: e.target.value }))} placeholder="e.g. A*, B, 88%" className={fc} /></div>
                 <div><label className={lc}>Notes</label><textarea rows={3} value={pf.notes} onChange={e => setPf(p => ({ ...p, notes: e.target.value }))} placeholder="Feedback for student…" className={`${fc} resize-none`} /></div>
@@ -445,13 +445,13 @@ function TeacherDashboard({ session }: { session: AppSession }) {
               </div>
               {allProgress.length > 0 && (
                 <div className="mt-8">
-                  <h3 className="text-white font-semibold mb-3">Saved Records</h3>
+                  <h3 className="text-[#1B2A44] font-semibold mb-3">Saved Records</h3>
                   <div className="space-y-2">
                     {allProgress.map(p => (
-                      <div key={`${p.studentEmail}-${p.subject}`} className="glass rounded-xl p-3 border border-white/[0.06] flex items-center gap-3 text-sm">
-                        <div className="flex-1"><span className="text-white font-medium">{p.subject}</span><span className="text-[#6B829E] text-xs ml-2">{students.find(s => s.email === p.studentEmail)?.name ?? p.studentEmail}</span></div>
+                      <div key={`${p.studentEmail}-${p.subject}`} className="bg-white rounded-xl p-3 border border-[#E2E8F0] flex items-center gap-3 text-sm">
+                        <div className="flex-1"><span className="text-[#1B2A44] font-medium">{p.subject}</span><span className="text-[#94A3B8] text-xs ml-2">{students.find(s => s.email === p.studentEmail)?.name ?? p.studentEmail}</span></div>
                         <span className="text-brand-orange font-bold">{p.progress}%</span>
-                        {p.grade && <span className="text-[#7BBF2A] text-xs">{p.grade}</span>}
+                        {p.grade && <span className="text-[#22C55E] text-xs">{p.grade}</span>}
                       </div>
                     ))}
                   </div>
@@ -464,7 +464,7 @@ function TeacherDashboard({ session }: { session: AppSession }) {
         {tab === 'reminders' && (
           <motion.div key="rem" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="max-w-lg">
-              <h2 className="text-white font-semibold mb-6">Send Reminder to Student</h2>
+              <h2 className="text-[#1B2A44] font-semibold mb-6">Send Reminder to Student</h2>
               <div className="space-y-4">
                 <div><label className={lc}>Student *</label><StudentSelect value={rf.studentEmail} onChange={v => setRf(p => ({ ...p, studentEmail: v }))} /></div>
                 <div><label className={lc}>Message *</label>

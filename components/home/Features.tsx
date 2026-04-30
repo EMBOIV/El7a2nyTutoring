@@ -57,10 +57,10 @@ export default function Features() {
   return (
     <section className="section relative overflow-hidden">
       <div aria-hidden className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0F1C30] via-[#0D1926] to-[#0F1C30]" />
-        <div className="orb w-[600px] h-[600px] bg-brand-orange opacity-[0.05] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute inset-0 dot-grid opacity-25" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+        <div className="absolute inset-0 bg-[#F5F7FA]" />
+        <div className="orb w-[600px] h-[600px] bg-brand-orange opacity-[0.04] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute inset-0 dot-grid opacity-60" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-[#E2E8F0]" />
       </div>
 
       <div className="max-w-7xl mx-auto container-pad relative z-10">
@@ -74,11 +74,11 @@ export default function Features() {
           <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
             Why El7a2ny
           </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mt-4 mb-5 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-4 mb-5 leading-tight">
             Everything You Need to
             <span className="gradient-text"> Succeed</span>
           </h2>
-          <p className="text-[#9BAFC8] max-w-xl mx-auto text-lg">
+          <p className="text-[#64748B] max-w-xl mx-auto text-lg">
             We built El7a2ny around one goal: giving every IGCSE student an unfair advantage.
           </p>
         </motion.div>
@@ -92,20 +92,19 @@ export default function Features() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -5, transition: { duration: 0.22 } }}
-              className={`relative rounded-2xl p-7 bg-gradient-to-br ${feature.gradient} border ${feature.border} group cursor-default`}
-              style={{ backdropFilter: 'blur(8px)' }}
+              className={`relative rounded-2xl p-7 bg-white border border-[#E2E8F0] shadow-sm group cursor-default hover:shadow-md hover:border-brand-orange/30 transition-all duration-300`}
             >
               {/* Hover shine */}
               <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
                 style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%)' }}
               />
 
-              <div className={`inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.iconBg} border ${feature.border} items-center justify-center text-2xl mb-5`}>
+              <div className={`inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.iconBg} border border-[#E2E8F0] items-center justify-center text-2xl mb-5`}>
                 {feature.icon}
               </div>
 
-              <h3 className="text-white font-semibold text-lg mb-3">{feature.title}</h3>
-              <p className="text-[#9BAFC8] text-sm leading-relaxed">{feature.description}</p>
+              <h3 className="text-[#1B2A44] font-semibold text-lg mb-3">{feature.title}</h3>
+              <p className="text-[#64748B] text-sm leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
         </div>

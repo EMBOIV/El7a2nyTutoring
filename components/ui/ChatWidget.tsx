@@ -190,14 +190,14 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 max-h-[420px] glass rounded-2xl overflow-hidden shadow-2xl shadow-black/50 flex flex-col"
+            className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 max-h-[420px] bg-white rounded-2xl overflow-hidden border border-[#E2E8F0] shadow-[0_12px_40px_rgba(27,42,68,0.16)] flex flex-col"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-brand-orange to-brand-orangeSoft px-4 py-3 flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-bold">E</div>
               <div>
                 <p className="text-white font-semibold text-sm">El7a2ny Assistant</p>
-                <p className="text-white/70 text-xs">Always online</p>
+                <p className="text-white/80 text-xs">Always online</p>
               </div>
               <span className="ml-auto w-2 h-2 bg-green-400 rounded-full" />
             </div>
@@ -210,7 +210,7 @@ export default function ChatWidget() {
                     className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm leading-relaxed ${
                       msg.role === 'user'
                         ? 'bg-brand-orange text-white rounded-br-sm'
-                        : 'bg-white/[0.07] text-slate-200 rounded-bl-sm'
+                        : 'bg-[#F5F7FA] text-[#334155] rounded-bl-sm border border-[#E2E8F0]'
                     }`}
                   >
                     {msg.text}
@@ -223,7 +223,7 @@ export default function ChatWidget() {
                     <button
                       key={option.id}
                       onClick={option.action}
-                      className="px-3 py-1.5 rounded-full text-xs bg-white/[0.07] border border-white/[0.10] text-[#D9E4F5] hover:border-brand-orange/50 hover:text-white transition-colors"
+                      className="px-3 py-1.5 rounded-full text-xs bg-white border border-[#E2E8F0] text-[#64748B] hover:border-brand-orange/40 hover:text-[#1B2A44] transition-colors"
                     >
                       {option.label}
                     </button>
@@ -234,14 +234,14 @@ export default function ChatWidget() {
             </div>
 
             {/* Input */}
-            <div className="p-3 border-t border-white/10 flex gap-2">
+            <div className="p-3 border-t border-[#E2E8F0] flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && send()}
                 placeholder="Type a message…"
-                className="flex-1 bg-white/[0.06] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-[#6B829E] focus:outline-none focus:border-brand-orange/50"
+                className="flex-1 bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm text-[#1B2A44] placeholder-[#94A3B8] focus:outline-none focus:border-brand-orange/50"
               />
               <button
                 onClick={send}

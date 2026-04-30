@@ -23,10 +23,10 @@ export default function Testimonials() {
   return (
     <section className="section relative overflow-hidden">
       <div aria-hidden className="absolute inset-0 pointer-events-none">
-        <div className="orb w-[600px] h-[600px] bg-brand-orange opacity-[0.06] -top-40 left-1/2 -translate-x-1/2" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.015] to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
+        <div className="absolute inset-0 bg-[#F5F7FA]" />
+        <div className="orb w-[600px] h-[600px] bg-brand-orange opacity-[0.04] -top-40 left-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-[#E2E8F0]" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#E2E8F0]" />
       </div>
 
       <div className="max-w-7xl mx-auto container-pad relative z-10">
@@ -40,11 +40,11 @@ export default function Testimonials() {
           <span className="inline-block text-brand-orange text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20">
             Reviews
           </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mt-4 mb-5 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-4 mb-5 leading-tight">
             Students Who
             <span className="gradient-text"> Succeeded</span>
           </h2>
-          <p className="text-[#9BAFC8] max-w-lg mx-auto text-lg">
+          <p className="text-[#64748B] max-w-lg mx-auto text-lg">
             Real results from real IGCSE students.
           </p>
         </motion.div>
@@ -57,12 +57,12 @@ export default function Testimonials() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -32, scale: 0.98 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-2xl p-8 md:p-10 card-dark border border-white/[0.09]"
-              style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset' }}
+              className="relative rounded-2xl p-8 md:p-10 bg-white border border-[#E2E8F0]"
+              style={{ boxShadow: '0 4px 32px rgba(27,42,68,0.08)' }}
             >
               {/* Card shine */}
               <div className="absolute inset-0 rounded-2xl pointer-events-none"
-                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%)' }}
+                style={{ background: 'linear-gradient(135deg, rgba(242,116,5,0.02) 0%, transparent 50%)' }}
               />
 
               {/* Stars */}
@@ -76,7 +76,7 @@ export default function Testimonials() {
 
               {/* Quote */}
               <div className="text-5xl text-brand-orange/20 font-serif leading-none mb-2 select-none">&ldquo;</div>
-              <p className="text-[#D0DDEF] text-lg leading-relaxed mb-8 font-medium">{t.text}</p>
+              <p className="text-[#334155] text-lg leading-relaxed mb-8 font-medium">{t.text}</p>
 
               {/* Author */}
               <div className="flex items-center gap-4">
@@ -84,7 +84,7 @@ export default function Testimonials() {
                   {t.avatar}
                 </div>
                 <div>
-                  <p className="text-white font-semibold">{t.name}</p>
+                  <p className="text-[#1B2A44] font-semibold">{t.name}</p>
                   <p className="text-brand-orange text-sm font-medium">{t.grade}</p>
                 </div>
               </div>
@@ -96,7 +96,7 @@ export default function Testimonials() {
             <button
               onClick={prev}
               aria-label="Previous"
-              className="w-10 h-10 rounded-xl card-dark border border-white/[0.09] flex items-center justify-center text-[#9BAFC8] hover:text-white hover:border-white/[0.20] transition-all duration-200"
+              className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-[#1B2A44] hover:border-[#CBD5E1] transition-all duration-200"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
@@ -108,7 +108,7 @@ export default function Testimonials() {
                   onClick={() => setActive(i)}
                   aria-label={`Testimonial ${i + 1}`}
                   className={`rounded-full transition-all duration-300 ${
-                    i === active ? 'w-7 h-2.5 bg-brand-orange shadow-[0_0_8px_rgba(242,116,5,0.60)]' : 'w-2.5 h-2.5 bg-white/20 hover:bg-white/40'
+                    i === active ? 'w-7 h-2.5 bg-brand-orange' : 'w-2.5 h-2.5 bg-[#CBD5E1] hover:bg-[#94A3B8]'
                   }`}
                 />
               ))}
@@ -117,7 +117,7 @@ export default function Testimonials() {
             <button
               onClick={next}
               aria-label="Next"
-              className="w-10 h-10 rounded-xl card-dark border border-white/[0.09] flex items-center justify-center text-[#9BAFC8] hover:text-white hover:border-white/[0.20] transition-all duration-200"
+              className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-[#1B2A44] hover:border-[#CBD5E1] transition-all duration-200"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
             </button>
