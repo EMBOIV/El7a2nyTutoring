@@ -46,7 +46,11 @@ export default function Navbar() {
     const load = () => setSession(getSession());
     load();
     window.addEventListener('storage', load);
-    return () => window.removeEventListener('storage', load);
+    window.addEventListener('el7a2ny-auth', load);
+    return () => {
+      window.removeEventListener('storage', load);
+      window.removeEventListener('el7a2ny-auth', load);
+    };
   }, []);
 
   const logout = () => {

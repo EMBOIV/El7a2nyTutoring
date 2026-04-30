@@ -9,12 +9,14 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
-type SessionOption = 'OL' | 'AS' | 'AL';
+type LevelOption = 'OL' | 'AS' | 'A2' | 'AL';
+type ExamSession = 'May/Jun 2025' | 'Oct/Nov 2025' | 'May/Jun 2026' | 'Oct/Nov 2026' | 'May/Jun 2027';
 
-// Each selected subject has its own session choice
+// Each selected subject has its own level + exam session
 interface SubjectSession {
   subject: string;
-  session: SessionOption | '';
+  session: LevelOption | '';
+  examSession: ExamSession | '';
   emoji: string;
 }
 
@@ -29,7 +31,10 @@ interface UserSession {
 }
 
 const STEP_LABELS = ['Subjects', 'Sessions', 'Your Info', 'Confirm'];
-const SESSION_OPTIONS: SessionOption[] = ['OL', 'AS', 'AL'];
+const LEVEL_OPTIONS: LevelOption[] = ['OL', 'AS', 'A2', 'AL'];
+const EXAM_SESSIONS: ExamSession[] = ['May/Jun 2025', 'Oct/Nov 2025', 'May/Jun 2026', 'Oct/Nov 2026', 'May/Jun 2027'];
+
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LabeledInput({
@@ -83,12 +88,12 @@ export default function BookingPage() {
     const matched = subjects.find(s => s.name.toLowerCase() === preSubject.toLowerCase());
     if (!matched) return;
 
-    const selectedLevel: SessionOption | '' =
-      preLevel === 'OL' || preLevel === 'AS' || preLevel === 'AL' ? preLevel : '';
+    const selectedLevel: LevelOption | '' =
+      preLevel === 'OL' || preLevel === 'AS' || preLevel === 'A2' || preLevel === 'AL' ? preLevel : '';
 
     setSelections(prev => {
       if (prev.some(s => s.subject === matched.name)) return prev;
-      return [{ subject: matched.name, emoji: matched.emoji, session: selectedLevel }, ...prev];
+      return [{ subject: matched.name, emoji: matched.emoji, session: selectedLevel, examSession: '' }, ...prev];
     });
   }, [searchParams]);
 
@@ -108,15 +113,19 @@ export default function BookingPage() {
     setSelections(prev => {
       const exists = prev.find(s => s.subject === name);
       if (exists) return prev.filter(s => s.subject !== name);
-      return [...prev, { subject: name, emoji, session: '' }];
+      return [...prev, { subject: name, emoji, session: '', examSession: '' }];
     });
   };
 
-  const setSession = (subject: string, session: SessionOption) => {
+  const setLevel = (subject: string, session: LevelOption) => {
     setSelections(prev => prev.map(s => s.subject === subject ? { ...s, session } : s));
   };
 
-  const allSessionsFilled = selections.length > 0 && selections.every(s => s.session !== '');
+  const setExamSession = (subject: string, examSession: ExamSession) => {
+    setSelections(prev => prev.map(s => s.subject === subject ? { ...s, examSession } : s));
+  };
+
+  const allSessionsFilled = selections.length > 0 && selections.every(s => s.session !== '' && s.examSession !== '');
 
   const validateInfo = () => {
     const e: { name?: string; email?: string } = {};
@@ -150,7 +159,7 @@ export default function BookingPage() {
       const response = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subjects: selections.map(s => ({ subject: s.subject, session: s.session })) }),
+        body: JSON.stringify({ name, email, subjects: selections.map(s => ({ subject: s.subject, session: s.session, examSession: s.examSession })) }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Booking request failed');
@@ -168,7 +177,7 @@ export default function BookingPage() {
           time: '',
           sessionType: 'Online',
           status: 'pending',
-          notes: `Level: ${s.session}`,
+          notes: `Level: ${s.session} | Exam: ${s.examSession}`,
           createdAt: new Date().toISOString(),
         });
       });
@@ -207,9 +216,14 @@ export default function BookingPage() {
                 <span className="text-brand-navy font-semibold">{email}</span>
               </div>
               {selections.map((s, i) => (
-                <div key={s.subject} className={`flex justify-between py-1 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
-                  <span className="text-slate-600">{s.emoji} {s.subject}</span>
-                  <span className="text-brand-navy font-semibold">{s.session}</span>
+                <div key={s.subject} className={`py-1 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">{s.emoji} {s.subject}</span>
+                    <span className="text-brand-navy font-semibold">{s.session}</span>
+                  </div>
+                  <div className="flex justify-end">
+                    <span className="text-xs text-slate-500">{s.examSession}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -336,30 +350,58 @@ export default function BookingPage() {
                 </motion.div>
               )}
 
-              {/* ── STEP 2: Pick session per subject ── */}
+              {/* ── STEP 2: Pick level + exam session per subject ── */}
               {step === 2 && (
                 <motion.div key="session-step" {...stepSlide}>
-                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Select Level per Subject</h2>
-                  <p className="text-slate-600 text-sm mb-6">Choose OL, AS, or AL for each selected subject.</p>
+                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Level &amp; Exam Session</h2>
+                  <p className="text-slate-600 text-sm mb-6">Choose your level and target exam session for each subject.</p>
                   <div className="space-y-6">
                     {selections.map(sel => (
                       <div key={sel.subject} className="rounded-xl border border-brand-grayMuted bg-white p-4">
-                        <p className="text-brand-navy font-semibold mb-3">{sel.emoji} {sel.subject}</p>
-                        <div className="grid grid-cols-3 gap-3">
-                          {SESSION_OPTIONS.map(session => {
-                            const active = sel.session === session;
+                        <p className="text-brand-navy font-semibold mb-4">{sel.emoji} {sel.subject}</p>
+
+                        {/* Level */}
+                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Level</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                          {LEVEL_OPTIONS.map(lvl => {
+                            const active = sel.session === lvl;
                             return (
                               <motion.button
-                                key={session}
+                                key={lvl}
                                 whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-                                onClick={() => setSession(sel.subject, session)}
-                                className={`rounded-lg border px-2 py-3 text-center text-sm font-medium transition-all duration-200 ${
+                                onClick={() => setLevel(sel.subject, lvl)}
+                                className={`rounded-lg border px-2 py-2.5 text-center text-sm font-semibold transition-all duration-200 ${
                                   active
                                     ? 'bg-brand-orange text-white border-brand-orange shadow-md'
                                     : 'text-brand-navy border-brand-grayMuted hover:border-brand-orange/50'
                                 }`}
                               >
-                                {session}
+                                <span className="block">{lvl}</span>
+                                <span className={`text-[10px] font-normal block mt-0.5 ${ active ? 'text-orange-100' : 'text-slate-400' }`}>
+                                  {lvl === 'OL' ? 'IGCSE' : lvl === 'AS' ? 'AS Level' : lvl === 'A2' ? 'A2 Level' : 'Full A Level'}
+                                </span>
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Exam session */}
+                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Exam Session</p>
+                        <div className="flex flex-wrap gap-2">
+                          {EXAM_SESSIONS.map(es => {
+                            const active = sel.examSession === es;
+                            return (
+                              <motion.button
+                                key={es}
+                                whileTap={reduceMotion ? undefined : { scale: 0.97 }}
+                                onClick={() => setExamSession(sel.subject, es)}
+                                className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                                  active
+                                    ? 'bg-[#1B2A44] text-white border-[#1B2A44] shadow-md'
+                                    : 'text-brand-navy border-brand-grayMuted hover:border-[#1B2A44]/50'
+                                }`}
+                              >
+                                {es}
                               </motion.button>
                             );
                           })}
@@ -417,9 +459,14 @@ export default function BookingPage() {
                       <span className="text-brand-navy font-semibold">{loggedInUser?.email ?? info.email}</span>
                     </div>
                     {selections.map((s, i) => (
-                      <div key={s.subject} className={`flex justify-between py-2 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
-                        <span className="text-slate-600">{s.emoji} {s.subject}</span>
-                        <span className="text-brand-navy font-semibold">{s.session}</span>
+                      <div key={s.subject} className={`py-2 ${i < selections.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">{s.emoji} {s.subject}</span>
+                          <span className="text-brand-navy font-semibold">{s.session}</span>
+                        </div>
+                        <div className="flex justify-end mt-0.5">
+                          <span className="text-xs text-slate-500">{s.examSession}</span>
+                        </div>
                       </div>
                     ))}
                   </div>

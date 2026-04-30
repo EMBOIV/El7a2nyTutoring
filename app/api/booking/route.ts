@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 interface SubjectEntry {
   subject: string;
   session: string;
+  examSession?: string;
 }
 
 interface BookingPayload {
@@ -22,6 +23,7 @@ function buildSubjectsTable(entries: SubjectEntry[]): string {
     <tr style="background:${i % 2 === 0 ? '#F8F8F8' : '#fff'};">
       <td style="padding:10px 14px;font-weight:600;">${e.subject}</td>
       <td style="padding:10px 14px;">${e.session}</td>
+      <td style="padding:10px 14px;">${e.examSession ?? '—'}</td>
     </tr>`).join('');
   return `
     <table style="width:100%;border-collapse:collapse;margin:20px 0;">
@@ -29,6 +31,7 @@ function buildSubjectsTable(entries: SubjectEntry[]): string {
         <tr style="background:#1B2A44;">
           <th style="padding:10px 14px;text-align:left;color:#fff;font-size:13px;">Subject</th>
           <th style="padding:10px 14px;text-align:left;color:#fff;font-size:13px;">Level</th>
+          <th style="padding:10px 14px;text-align:left;color:#fff;font-size:13px;">Exam Session</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -56,7 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     const resend = new Resend(apiKey);
-    const subjectList = entries.map(e => `${e.subject} (${e.session})`).join(', ');
+    const subjectList = entries.map(e => `${e.subject} (${e.session}${e.examSession ? ', ' + e.examSession : ''})`).join(', ');
 
     const studentHtml = `
       <div style="font-family:Arial,sans-serif;line-height:1.7;color:#1B2A44;max-width:560px;margin:auto;">

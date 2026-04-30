@@ -76,10 +76,12 @@ export function getSession(): AppSession | null {
 
 export function saveSession(session: AppSession): void {
   localStorage.setItem('el7a2ny_session', JSON.stringify(session));
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('el7a2ny-auth'));
 }
 
 export function clearSession(): void {
   localStorage.removeItem('el7a2ny_session');
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('el7a2ny-auth'));
 }
 
 // ─── Users ────────────────────────────────────────────────────────────────────
