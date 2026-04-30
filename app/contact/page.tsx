@@ -34,8 +34,8 @@ const CONTACT_INFO = [
       </svg>
     ),
     label: 'WhatsApp',
-    value: '+20 100 000 0000',
-    href: 'https://wa.me/201000000000',
+    value: '+20 101 029 4098',
+    href: 'https://wa.me/201010294098',
   },
   {
     icon: (

@@ -7,7 +7,7 @@ import { stepSlide } from '@/lib/animations';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
-type SessionOption = 'June / July' | 'October / November' | 'January';
+type SessionOption = 'Online' | 'Face-to-Face (Private)' | 'WhatsApp Session';
 
 // Each selected subject has its own session choice
 interface SubjectSession {
@@ -27,19 +27,20 @@ interface UserSession {
 }
 
 const STEP_LABELS = ['Subjects', 'Sessions', 'Your Info', 'Confirm'];
-const SESSION_OPTIONS: SessionOption[] = ['June / July', 'October / November', 'January'];
+const SESSION_OPTIONS: SessionOption[] = ['Online', 'Face-to-Face (Private)', 'WhatsApp Session'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function FloatingInput({
-  id, label, type, value, onChange,
+function LabeledInput({
+  id, label, type, value, onChange, hasError,
 }: {
-  id: string; label: string; type: string; value: string; onChange: (v: string) => void;
+  id: string; label: string; type: string; value: string; onChange: (v: string) => void; hasError?: boolean;
 }) {
   return (
-    <div className="field-wrap">
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-[#9BAFC8] mb-1.5">{label}</label>
       <input id={id} type={type} value={value} onChange={e => onChange(e.target.value)}
-        placeholder=" " className="input-field input-floating" />
-      <label htmlFor={id} className="field-label">{label}</label>
+        placeholder={type === 'email' ? 'your@email.com' : 'Your full name'}
+        className={`input-field ${hasError ? 'border-red-500/60 focus:border-red-500/80' : ''}`} />
     </div>
   );
 }
@@ -266,8 +267,8 @@ export default function BookingPage() {
                           onClick={() => toggleSubject(subject.name, subject.emoji)}
                           className={`rounded-xl border p-4 text-left transition-all duration-200 relative ${
                             selected
-                              ? 'bg-brand-orange/5 border-brand-orange ring-2 ring-brand-orange/25 shadow-md'
-                              : 'bg-white border-brand-grayMuted hover:shadow-lg hover:shadow-brand-navyDeep/10'
+                              ? 'bg-white border-brand-orange ring-2 ring-brand-orange/30 shadow-[0_4px_16px_rgba(242,116,5,0.22)]'
+                              : 'bg-white border-brand-grayMuted hover:shadow-lg hover:shadow-brand-navyDeep/10 hover:border-brand-orange/40'
                           }`}
                         >
                           {selected && (
@@ -296,7 +297,7 @@ export default function BookingPage() {
               {step === 2 && (
                 <motion.div key="session-step" {...stepSlide}>
                   <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Select Session per Subject</h2>
-                  <p className="text-slate-600 text-sm mb-6">Choose your target exam session for each subject.</p>
+                  <p className="text-slate-600 text-sm mb-6">Choose how you&apos;d like to have each session.</p>
                   <div className="space-y-6">
                     {selections.map(sel => (
                       <div key={sel.subject} className="rounded-xl border border-brand-grayMuted bg-white p-4">
@@ -342,14 +343,14 @@ export default function BookingPage() {
                   <h2 className="text-brand-navy font-bold text-xl mb-4">Step 3: Enter Your Details</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <FloatingInput id="fullName" type="text" label="Full Name *" value={info.name}
+                      <LabeledInput id="fullName" type="text" label="Full Name *" value={info.name} hasError={!!errors.name}
                         onChange={v => { setInfo(p => ({ ...p, name: v })); if (errors.name) setErrors(p => ({ ...p, name: undefined })); }} />
-                      {errors.name && <p className="text-red-600 text-xs mt-1.5">{errors.name}</p>}
+                      {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
                     </div>
                     <div>
-                      <FloatingInput id="email" type="email" label="Email *" value={info.email}
+                      <LabeledInput id="email" type="email" label="Email Address *" value={info.email} hasError={!!errors.email}
                         onChange={v => { setInfo(p => ({ ...p, email: v })); if (errors.email) setErrors(p => ({ ...p, email: undefined })); }} />
-                      {errors.email && <p className="text-red-600 text-xs mt-1.5">{errors.email}</p>}
+                      {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
                     </div>
                   </div>
                   <div className="mt-6 flex gap-3">
