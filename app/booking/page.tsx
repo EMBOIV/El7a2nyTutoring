@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { stepSlide } from '@/lib/animations';
 import {
   addSession,
+  getSessions,
   getRoleForEmail,
   getUsers,
   isValidPhone,
@@ -47,7 +48,7 @@ interface SubjectSelection {
   subject: string;
   emoji: string;
   level: LevelOption | '';
-  examTypes: ExamType[];
+  examType: ExamType | '';
   examSession: ExamSession | '';
 }
 
@@ -56,11 +57,6 @@ const LEVEL_OPTIONS: LevelOption[] = ['OL', 'AS', 'A2', 'AL'];
 const EXAM_TYPES: ExamType[] = ['Cambridge', 'Edexcel'];
 const EXAM_SESSIONS: ExamSession[] = ['Jan/Feb 2025', 'May/Jun 2025', 'Oct/Nov 2025', 'Jan/Feb 2026', 'May/Jun 2026', 'Oct/Nov 2026', 'Jan/Feb 2027', 'May/Jun 2027'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function formatExamTypes(value: ExamType[]): string {
-  if (value.length === 0) return 'Not selected';
-  return value.join(' + ');
-}
 
 function LabeledInput({
   id, label, type, value, onChange, hasError,
@@ -156,7 +152,7 @@ export default function BookingPage() {
 
     setSelectedSubjects(prev => {
       if (prev.some(item => item.subject === matched.name)) return prev;
-      return [...prev, { subject: matched.name, emoji: matched.emoji, level, examTypes: [], examSession: '' }];
+      return [{ subject: matched.name, emoji: matched.emoji, level, examType: '', examSession: '' }];
     });
   }, [searchParams]);
 
@@ -176,35 +172,21 @@ export default function BookingPage() {
   }, [subjectOptions, search, activeCategory]);
 
   const selectedCount = selectedSubjects.length;
-  const configuredAll = selectedSubjects.length > 0 && selectedSubjects.every(subject => subject.level && subject.examTypes.length > 0 && subject.examSession);
+  const configuredAll = selectedSubjects.length > 0 && selectedSubjects.every(subject => subject.level && subject.examType && subject.examSession);
 
   const progressScale = (step - 1) / 3;
 
   const toggleSubject = (subject: SubjectItem) => {
     setSelectedSubjects(prev => {
       const exists = prev.find(item => item.subject === subject.name);
-      if (exists) {
-        return prev.filter(item => item.subject !== subject.name);
-      }
-      return [...prev, { subject: subject.name, emoji: subject.emoji, level: '', examTypes: [], examSession: '' }];
+      if (exists) return prev.filter(item => item.subject !== subject.name);
+      // Single subject booking only.
+      return [{ subject: subject.name, emoji: subject.emoji, level: '', examType: '', examSession: '' }];
     });
   };
 
   const updateSubjectSelection = (subjectName: string, patch: Partial<SubjectSelection>) => {
     setSelectedSubjects(prev => prev.map(item => item.subject === subjectName ? { ...item, ...patch } : item));
-  };
-
-  const toggleExamTypeForSubject = (subjectName: string, examType: ExamType) => {
-    setSelectedSubjects(prev => prev.map(item => {
-      if (item.subject !== subjectName) return item;
-      const hasType = item.examTypes.includes(examType);
-      return {
-        ...item,
-        examTypes: hasType
-          ? item.examTypes.filter(t => t !== examType)
-          : [...item.examTypes, examType],
-      };
-    }));
   };
 
   const validateInfo = () => {
@@ -231,6 +213,20 @@ export default function BookingPage() {
     const email = loggedInUser?.email ?? info.email;
     const phone = normalizePhone(loggedInUser?.phone ?? info.phone);
 
+    const duplicatePending = getSessions().some(existing => {
+      if (existing.status !== 'pending') return false;
+      if (normalizeEmail(existing.studentEmail) !== normalizeEmail(email)) return false;
+      return selectedSubjects.some(subject => {
+        const expectedNotes = `Level: ${subject.level} | Exam Type: ${subject.examType} | Exam Session: ${subject.examSession}`;
+        return existing.subject === subject.subject && existing.notes === expectedNotes;
+      });
+    });
+
+    if (duplicatePending) {
+      setApiError('You already have this session pending. Please wait for confirmation or rejection before booking it again.');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch('/api/booking', {
@@ -243,7 +239,7 @@ export default function BookingPage() {
           subjects: selectedSubjects.map(subject => ({
             subject: subject.subject,
             session: subject.level,
-            examSession: `${formatExamTypes(subject.examTypes)} | ${subject.examSession}`,
+            examSession: `${subject.examType} | ${subject.examSession}`,
           })),
         }),
       });
@@ -262,7 +258,7 @@ export default function BookingPage() {
           time: '',
           sessionType: 'Online',
           status: 'pending',
-          notes: `Level: ${subject.level} | Exam Type: ${formatExamTypes(subject.examTypes)} | Exam Session: ${subject.examSession}`,
+          notes: `Level: ${subject.level} | Exam Type: ${subject.examType} | Exam Session: ${subject.examSession}`,
           createdAt: new Date().toISOString(),
         });
       });
@@ -378,7 +374,7 @@ export default function BookingPage() {
                     <span className="text-[#334155]">{subject.emoji} {subject.subject}</span>
                     <span className="text-brand-navy font-semibold">{subject.level}</span>
                   </div>
-                  <div className="flex justify-end text-xs text-[#64748B]">{formatExamTypes(subject.examTypes)} • {subject.examSession}</div>
+                  <div className="flex justify-end text-xs text-[#64748B]">{subject.examType} • {subject.examSession}</div>
                 </div>
               ))}
             </div>
@@ -494,7 +490,7 @@ export default function BookingPage() {
               {step === 1 && (
                 <motion.div key="subjects-step" {...stepSlide}>
                   <h2 className="text-brand-navy font-bold text-xl mb-2">Step 1: Choose Subjects</h2>
-                  <p className="text-[#334155] text-sm mb-4">Pick one or more subjects. Use search + category filters for speed.</p>
+                  <p className="text-[#334155] text-sm mb-4">Pick one subject. Use search + category filters for speed.</p>
 
                   <input
                     type="text"
@@ -568,7 +564,7 @@ export default function BookingPage() {
                       disabled={selectedCount === 0}
                       className="btn-primary px-8 py-3 text-sm disabled:opacity-40"
                     >
-                      Continue with {selectedCount} Subject{selectedCount > 1 ? 's' : ''}
+                      Continue with {selectedCount} Subject
                     </button>
                   </div>
                 </motion.div>
@@ -604,14 +600,14 @@ export default function BookingPage() {
                           })}
                         </div>
 
-                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Type (select one or both)</p>
+                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Type</p>
                         <div className="grid grid-cols-2 gap-2 mb-4">
                           {EXAM_TYPES.map(examType => {
-                            const active = subject.examTypes.includes(examType);
+                            const active = subject.examType === examType;
                             return (
                               <button
                                 key={examType}
-                                onClick={() => toggleExamTypeForSubject(subject.subject, examType)}
+                                onClick={() => updateSubjectSelection(subject.subject, { examType })}
                                 className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
                                   active
                                     ? 'bg-brand-orange text-white border-brand-orange shadow-md'
@@ -713,7 +709,7 @@ export default function BookingPage() {
                           <span className="text-brand-navy font-semibold">{subject.level}</span>
                         </div>
                         <div className="flex justify-end mt-0.5">
-                          <span className="text-xs text-[#64748B]">{formatExamTypes(subject.examTypes)} • {subject.examSession}</span>
+                          <span className="text-xs text-[#64748B]">{subject.examType} • {subject.examSession}</span>
                         </div>
                       </div>
                     ))}
