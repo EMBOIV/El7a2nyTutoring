@@ -1,6 +1,6 @@
 import { subjects } from '@/lib/subjects';
 
-export type SupportedLevel = 'IGCSE' | 'OL' | 'AS' | 'A2';
+export type SupportedLevel = 'OL' | 'AS' | 'A2' | 'AL';
 
 export interface SubjectResult {
   id: string;
@@ -27,21 +27,6 @@ const CATEGORY_BY_SUBJECT_ID: Record<string, string> = {
 };
 
 const LEVEL_SUBJECT_IDS: Record<SupportedLevel, string[]> = {
-  IGCSE: [
-    'mathematics',
-    'physics',
-    'chemistry',
-    'biology',
-    'human-biology',
-    'it',
-    'computer-science',
-    'accounting',
-    'business',
-    'economics',
-    'combined-science',
-    'arabic',
-    'national-arabic',
-  ],
   OL: [
     'mathematics',
     'physics',
@@ -83,16 +68,30 @@ const LEVEL_SUBJECT_IDS: Record<SupportedLevel, string[]> = {
     'economics',
     'arabic',
   ],
+  AL: [
+    'mathematics',
+    'physics',
+    'chemistry',
+    'biology',
+    'human-biology',
+    'it',
+    'computer-science',
+    'accounting',
+    'business',
+    'economics',
+    'arabic',
+  ],
 };
 
 function normalizeLevel(level?: string | null): SupportedLevel | null {
   if (!level) return null;
   const normalized = level.trim().toUpperCase();
-  if (normalized === 'IGCSE' || normalized === 'OL' || normalized === 'AS' || normalized === 'A2') {
+  if (normalized === 'OL' || normalized === 'AS' || normalized === 'A2' || normalized === 'AL') {
     return normalized;
   }
-  if (normalized === 'AL') {
-    return 'A2';
+  if (normalized === 'IGCSE') {
+    // Backward compatibility for older clients.
+    return 'OL';
   }
   return null;
 }

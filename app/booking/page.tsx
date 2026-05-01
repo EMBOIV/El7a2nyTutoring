@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
-type LevelOption = 'IGCSE' | 'OL' | 'AS' | 'A2';
+type LevelOption = 'OL' | 'AS' | 'A2' | 'AL';
 type SessionType = 'Group' | 'Private';
 
 interface ContactInfo {
@@ -40,7 +40,7 @@ interface BookingSelection {
 }
 
 const STEP_LABELS = ['Level', 'Subject', 'Session', 'Time'];
-const LEVEL_OPTIONS: LevelOption[] = ['IGCSE', 'OL', 'AS', 'A2'];
+const LEVEL_OPTIONS: LevelOption[] = ['OL', 'AS', 'A2', 'AL'];
 const SESSION_TYPES: SessionType[] = ['Group', 'Private'];
 const TIME_OPTIONS = ['Today evening', 'Tomorrow morning', 'Tomorrow evening', 'This weekend', 'Flexible'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -115,7 +115,10 @@ export default function BookingPage() {
     const preSubject = searchParams.get('subject');
     const preLevel = searchParams.get('level');
 
-    if (preLevel && ['IGCSE', 'OL', 'AS', 'A2'].includes(preLevel)) {
+    if (preLevel === 'IGCSE') {
+      // Backward compatibility for older links that used IGCSE as level.
+      setSelection(prev => ({ ...prev, level: 'OL' }));
+    } else if (preLevel && ['OL', 'AS', 'A2', 'AL'].includes(preLevel)) {
       setSelection(prev => ({ ...prev, level: preLevel as LevelOption }));
     }
 
