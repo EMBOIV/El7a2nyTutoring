@@ -28,9 +28,9 @@ const SUGGESTED_OPTIONS: SuggestedOption[] = [
 const BOT_RESPONSES: Record<Intent | 'hello' | 'fallback', string> = {
   hello: 'Welcome to El7a2ny Tutoring. Tell me what you need, or tap an option below.',
   BOOK_SESSION: 'Booking takes less than a minute. I can take you to the guided booking flow now.',
-  CHOOSE_SUBJECT: 'Pick your level first, then choose a subject quickly using search. I can open that step for you.',
+  CHOOSE_SUBJECT: 'Start by selecting your subjects, then set level and session type for each one.',
   URGENT_HELP: 'If exams are close, start with a private session and a focused revision plan today.',
-  HOW_IT_WORKS: 'Simple flow: choose level, choose subject, choose session type, then pick a time. We handle the rest.',
+  HOW_IT_WORKS: 'Simple flow: choose subjects, set level and session type, add your details, then review and submit.',
   fallback: 'I can help you with booking, subjects, or exam prep. Choose an option below.',
 };
 
@@ -115,7 +115,7 @@ export default function ChatWidget() {
     }
 
     if (intent === 'CHOOSE_SUBJECT') {
-      setTimeout(() => router.push('/booking?step=2'), 500);
+      setTimeout(() => router.push('/booking'), 500);
       return;
     }
 
@@ -146,7 +146,7 @@ export default function ChatWidget() {
       }
 
       setRedirected(true);
-      pushBot(`Need direct help? Contact us on WhatsApp. ${whatsappLink}`);
+      pushBot('Need direct help? Tap the WhatsApp button below.');
       return next;
     });
   };
@@ -236,6 +236,14 @@ export default function ChatWidget() {
 
             {/* Suggested messages (always visible) */}
             <div className="px-3 py-2 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+              {redirected && (
+                <button
+                  onClick={() => window.open(whatsappLink, '_blank', 'noopener,noreferrer')}
+                  className="w-full mb-2 px-3 py-2.5 rounded-xl text-sm font-semibold bg-[#25D366] text-white hover:bg-[#1fb558] transition-colors"
+                >
+                  Chat on WhatsApp
+                </button>
+              )}
               <div className="flex flex-wrap gap-2">
                 {SUGGESTED_OPTIONS.map(option => (
                   <button
