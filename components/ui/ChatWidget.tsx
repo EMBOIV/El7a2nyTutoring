@@ -30,7 +30,7 @@ const BOT_RESPONSES: Record<Intent | 'hello' | 'fallback', string> = {
   BOOK_SESSION: 'Booking takes less than a minute. I can take you to the guided booking flow now.',
   CHOOSE_SUBJECT: 'Start by selecting your subjects, then set level and session type for each one.',
   URGENT_HELP: 'If exams are close, start with a private session and a focused revision plan today.',
-  HOW_IT_WORKS: 'Simple flow: choose subjects, set level and session type, add your details, then review and submit.',
+  HOW_IT_WORKS: 'Simple flow: choose subjects, set level and exam session, add your details, then review and submit.',
   fallback: 'I can help you with booking, subjects, or exam prep. Choose an option below.',
 };
 

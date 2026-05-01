@@ -20,7 +20,8 @@ import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
 type LevelOption = 'OL' | 'AS' | 'A2' | 'AL';
-type SessionType = 'Group' | 'Private';
+type ExamType = 'Cambridge' | 'Edexcel';
+type ExamSession = 'Jan/Feb 2025' | 'May/Jun 2025' | 'Oct/Nov 2025' | 'Jan/Feb 2026' | 'May/Jun 2026' | 'Oct/Nov 2026' | 'Jan/Feb 2027' | 'May/Jun 2027';
 
 interface ContactInfo {
   name: string;
@@ -46,13 +47,20 @@ interface SubjectSelection {
   subject: string;
   emoji: string;
   level: LevelOption | '';
-  sessionType: SessionType | '';
+  examTypes: ExamType[];
+  examSession: ExamSession | '';
 }
 
 const STEP_LABELS = ['Subjects', 'Session Setup', 'Your Info', 'Review'];
 const LEVEL_OPTIONS: LevelOption[] = ['OL', 'AS', 'A2', 'AL'];
-const SESSION_TYPES: SessionType[] = ['Group', 'Private'];
+const EXAM_TYPES: ExamType[] = ['Cambridge', 'Edexcel'];
+const EXAM_SESSIONS: ExamSession[] = ['Jan/Feb 2025', 'May/Jun 2025', 'Oct/Nov 2025', 'Jan/Feb 2026', 'May/Jun 2026', 'Oct/Nov 2026', 'Jan/Feb 2027', 'May/Jun 2027'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function formatExamTypes(value: ExamType[]): string {
+  if (value.length === 0) return 'Not selected';
+  return value.join(' + ');
+}
 
 function LabeledInput({
   id, label, type, value, onChange, hasError,
@@ -148,7 +156,7 @@ export default function BookingPage() {
 
     setSelectedSubjects(prev => {
       if (prev.some(item => item.subject === matched.name)) return prev;
-      return [...prev, { subject: matched.name, emoji: matched.emoji, level, sessionType: '' }];
+      return [...prev, { subject: matched.name, emoji: matched.emoji, level, examTypes: [], examSession: '' }];
     });
   }, [searchParams]);
 
@@ -168,7 +176,7 @@ export default function BookingPage() {
   }, [subjectOptions, search, activeCategory]);
 
   const selectedCount = selectedSubjects.length;
-  const configuredAll = selectedSubjects.length > 0 && selectedSubjects.every(subject => subject.level && subject.sessionType);
+  const configuredAll = selectedSubjects.length > 0 && selectedSubjects.every(subject => subject.level && subject.examTypes.length > 0 && subject.examSession);
 
   const progressScale = (step - 1) / 3;
 
@@ -178,12 +186,25 @@ export default function BookingPage() {
       if (exists) {
         return prev.filter(item => item.subject !== subject.name);
       }
-      return [...prev, { subject: subject.name, emoji: subject.emoji, level: '', sessionType: '' }];
+      return [...prev, { subject: subject.name, emoji: subject.emoji, level: '', examTypes: [], examSession: '' }];
     });
   };
 
   const updateSubjectSelection = (subjectName: string, patch: Partial<SubjectSelection>) => {
     setSelectedSubjects(prev => prev.map(item => item.subject === subjectName ? { ...item, ...patch } : item));
+  };
+
+  const toggleExamTypeForSubject = (subjectName: string, examType: ExamType) => {
+    setSelectedSubjects(prev => prev.map(item => {
+      if (item.subject !== subjectName) return item;
+      const hasType = item.examTypes.includes(examType);
+      return {
+        ...item,
+        examTypes: hasType
+          ? item.examTypes.filter(t => t !== examType)
+          : [...item.examTypes, examType],
+      };
+    }));
   };
 
   const validateInfo = () => {
@@ -222,7 +243,7 @@ export default function BookingPage() {
           subjects: selectedSubjects.map(subject => ({
             subject: subject.subject,
             session: subject.level,
-            examSession: subject.sessionType,
+            examSession: `${formatExamTypes(subject.examTypes)} | ${subject.examSession}`,
           })),
         }),
       });
@@ -241,7 +262,7 @@ export default function BookingPage() {
           time: '',
           sessionType: 'Online',
           status: 'pending',
-          notes: `Level: ${subject.level} | Requested mode: ${subject.sessionType}`,
+          notes: `Level: ${subject.level} | Exam Type: ${formatExamTypes(subject.examTypes)} | Exam Session: ${subject.examSession}`,
           createdAt: new Date().toISOString(),
         });
       });
@@ -357,7 +378,7 @@ export default function BookingPage() {
                     <span className="text-[#334155]">{subject.emoji} {subject.subject}</span>
                     <span className="text-brand-navy font-semibold">{subject.level}</span>
                   </div>
-                  <div className="flex justify-end text-xs text-[#64748B]">{subject.sessionType} session</div>
+                  <div className="flex justify-end text-xs text-[#64748B]">{formatExamTypes(subject.examTypes)} • {subject.examSession}</div>
                 </div>
               ))}
             </div>
@@ -556,7 +577,7 @@ export default function BookingPage() {
               {step === 2 && (
                 <motion.div key="setup-step" {...stepSlide}>
                   <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Setup Each Subject</h2>
-                  <p className="text-[#334155] text-sm mb-6">Set level and session type for each selected subject.</p>
+                  <p className="text-[#334155] text-sm mb-6">Set level, exam type, and exam session for each selected subject.</p>
 
                   <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
                     {selectedSubjects.map(subject => (
@@ -583,25 +604,39 @@ export default function BookingPage() {
                           })}
                         </div>
 
-                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Session Needed</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {SESSION_TYPES.map(type => {
-                            const active = subject.sessionType === type;
+                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Type (select one or both)</p>
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                          {EXAM_TYPES.map(examType => {
+                            const active = subject.examTypes.includes(examType);
                             return (
                               <button
-                                key={type}
-                                onClick={() => updateSubjectSelection(subject.subject, { sessionType: type })}
+                                key={examType}
+                                onClick={() => toggleExamTypeForSubject(subject.subject, examType)}
                                 className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
                                   active
-                                    ? 'bg-[#1B2A44] text-white border-[#1B2A44] shadow-md'
-                                    : 'text-brand-navy border-brand-grayMuted hover:border-[#1B2A44]/50'
+                                    ? 'bg-brand-orange text-white border-brand-orange shadow-md'
+                                    : 'text-brand-navy border-brand-grayMuted hover:border-brand-orange/50'
                                 }`}
                               >
-                                {type}
+                                {examType}
                               </button>
                             );
                           })}
                         </div>
+
+                        <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Session</p>
+                        <select
+                          value={subject.examSession}
+                          onChange={e => updateSubjectSelection(subject.subject, { examSession: e.target.value as ExamSession })}
+                          aria-label={`Exam session for ${subject.subject}`}
+                          title={`Exam session for ${subject.subject}`}
+                          className="input-field"
+                        >
+                          <option value="">Select exam session</option>
+                          {EXAM_SESSIONS.map(examSession => (
+                            <option key={examSession} value={examSession}>{examSession}</option>
+                          ))}
+                        </select>
                       </div>
                     ))}
                   </div>
@@ -678,7 +713,7 @@ export default function BookingPage() {
                           <span className="text-brand-navy font-semibold">{subject.level}</span>
                         </div>
                         <div className="flex justify-end mt-0.5">
-                          <span className="text-xs text-[#64748B]">{subject.sessionType} session</span>
+                          <span className="text-xs text-[#64748B]">{formatExamTypes(subject.examTypes)} • {subject.examSession}</span>
                         </div>
                       </div>
                     ))}
