@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { stepSlide } from '@/lib/animations';
 import {
   addSession,
+  clearSession,
   getSessions,
   getRoleForEmail,
   getUsers,
@@ -16,7 +17,7 @@ import {
 } from '@/lib/auth';
 import type { AppUser } from '@/lib/auth';
 import { subjects } from '@/lib/subjects';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
@@ -80,6 +81,7 @@ function LabeledInput({
 
 export default function BookingPage() {
   const reduceMotion = useReducedMotion();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [step, setStep] = useState<Step>(1);
@@ -334,6 +336,13 @@ export default function BookingPage() {
       : { name: '', email: '', phone: '' });
   };
 
+  const handleNotYou = () => {
+    clearSession();
+    setLoggedInUser(null);
+    setInfo({ name: '', email: '', phone: '' });
+    router.push('/auth?tab=login');
+  };
+
   if (success) {
     const name = loggedInUser?.name ?? info.name;
     const email = loggedInUser?.email ?? info.email;
@@ -444,7 +453,7 @@ export default function BookingPage() {
                   <span className="text-brand-green text-lg">✓</span>
                   <span className="text-sm text-brand-navy">Booking as <strong>{loggedInUser.name}</strong> ({loggedInUser.email}{loggedInUser.phone ? ` · ${loggedInUser.phone}` : ''})</span>
                 </div>
-                <Link href="/auth" className="text-xs text-[#64748B] hover:text-brand-orange underline">Not you?</Link>
+                <button onClick={handleNotYou} className="text-xs text-[#64748B] hover:text-brand-orange underline">Not you?</button>
               </div>
             )}
 
