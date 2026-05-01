@@ -272,9 +272,10 @@ export default function BookingPage() {
         subject: selection.subject,
         date: new Date().toISOString().split('T')[0],
         time: selection.time,
-        sessionType: selection.sessionType,
+        // Keep compatibility with existing session model used across dashboard/profile.
+        sessionType: 'Online',
         status: 'pending',
-        notes: `Level: ${selection.level}`,
+        notes: `Level: ${selection.level} | Requested mode: ${selection.sessionType}`,
         createdAt: new Date().toISOString(),
       });
 
