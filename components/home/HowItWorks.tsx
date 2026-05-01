@@ -6,8 +6,8 @@ const STEPS = [
   {
     number: '01',
     icon: '🎯',
-    title: 'Choose Your Subject',
-    description: 'Browse our full IGCSE curriculum and select the subject(s) you need. Multiple subjects, one seamless booking.',
+    title: 'Choose Level and Subject',
+    description: 'Pick your level first, then quickly choose the right subject with guided search.',
     accent: 'from-brand-orange/20 to-brand-orange/5',
     border: 'border-brand-orange/30',
     glow: 'rgba(242,116,5,0.15)',
@@ -15,8 +15,8 @@ const STEPS = [
   {
     number: '02',
     icon: '📅',
-    title: 'Book a Session',
-    description: 'Pick your preferred exam session and submit your details in under 60 seconds. Simple, fast, no commitment.',
+    title: 'Select Session Type',
+    description: 'Choose a focused private session or a small group with up to 6 students.',
     accent: 'from-[#7BBF2A]/20 to-[#7BBF2A]/5',
     border: 'border-[#7BBF2A]/30',
     glow: 'rgba(123,191,42,0.15)',
@@ -24,8 +24,8 @@ const STEPS = [
   {
     number: '03',
     icon: '🚀',
-    title: 'Learn & Improve',
-    description: 'Join personalised sessions with expert tutors, track your progress weekly, and walk into your exam with confidence.',
+    title: 'Pick Time and Start',
+    description: 'Choose your preferred time and start a simple system built for fast exam improvement.',
     accent: 'from-[#A5C8FF]/20 to-[#A5C8FF]/5',
     border: 'border-[#A5C8FF]/30',
     glow: 'rgba(165,200,255,0.15)',
@@ -57,11 +57,11 @@ export default function HowItWorks() {
             Process
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-4 mb-5 leading-tight">
-            Three Steps to Your
-            <span className="gradient-text"> Best Grade</span>
+            Guided Flow to
+            <span className="gradient-text"> Better Results</span>
           </h2>
           <p className="text-[#64748B] max-w-lg mx-auto text-lg">
-            A clear, proven process that takes you from sign-up to exam confidence.
+            Clear actions, no overload, and a faster path from booking to progress.
           </p>
         </motion.div>
 

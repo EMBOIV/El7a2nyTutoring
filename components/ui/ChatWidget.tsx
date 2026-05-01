@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { subjects } from '@/lib/subjects';
 
 interface Message {
   id: number;
@@ -11,37 +10,86 @@ interface Message {
   text: string;
 }
 
-interface QuickOption {
+interface SuggestedOption {
   id: string;
   label: string;
-  action: () => void;
+  intent: Intent;
 }
 
-const BOT_RESPONSES: Record<string, string> = {
-  default: "I'm here to help. You can ask about subjects, levels (OL/AS/AL), booking, or pricing.",
-  hello: 'Welcome to El7a2ny Tutoring 👋 Need help with anything or want to book a subject now?',
-  pricing: 'Our sessions start from $30/hour. Bundle packages are available for better value. Visit the Booking page to see options!',
-  booking: 'You can book by subject with OL/AS/AL level in under 2 minutes. I can prefill it for you now.',
-  subjects: 'We cover: Maths, Physics, Chemistry, Biology, Human Biology, IT, CS, Accounting, Business, Economics, Combined Science, Arabic, and National Arabic (Year 12 Only).',
-  help: 'I can tell you about our subjects, pricing, booking process, or tutors. What would you like to know?',
+type Intent = 'BOOK_SESSION' | 'CHOOSE_SUBJECT' | 'URGENT_HELP' | 'HOW_IT_WORKS';
+
+const SUGGESTED_OPTIONS: SuggestedOption[] = [
+  { id: 'book-session', label: 'Book a session', intent: 'BOOK_SESSION' },
+  { id: 'choose-subjects', label: 'Choose my subjects', intent: 'CHOOSE_SUBJECT' },
+  { id: 'urgent-help', label: 'I need help before exams', intent: 'URGENT_HELP' },
+  { id: 'how-it-works', label: 'How does it work?', intent: 'HOW_IT_WORKS' },
+];
+
+const BOT_RESPONSES: Record<Intent | 'hello' | 'fallback', string> = {
+  hello: 'Welcome to El7a2ny Tutoring. Tell me what you need, or tap an option below.',
+  BOOK_SESSION: 'Booking takes less than a minute. I can take you to the guided booking flow now.',
+  CHOOSE_SUBJECT: 'Pick your level first, then choose a subject quickly using search. I can open that step for you.',
+  URGENT_HELP: 'If exams are close, start with a private session and a focused revision plan today.',
+  HOW_IT_WORKS: 'Simple flow: choose level, choose subject, choose session type, then pick a time. We handle the rest.',
+  fallback: 'I can help you with booking, subjects, or exam prep. Choose an option below.',
 };
 
-function getBotResponse(input: string): string {
-  const lower = input.toLowerCase();
-  if (lower.includes('price') || lower.includes('cost') || lower.includes('fee')) return BOT_RESPONSES.pricing;
-  if (lower.includes('book') || lower.includes('session') || lower.includes('schedule')) return BOT_RESPONSES.booking;
-  if (lower.includes('subject') || lower.includes('course')) return BOT_RESPONSES.subjects;
-  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) return BOT_RESPONSES.hello;
-  if (lower.includes('help')) return BOT_RESPONSES.help;
-  return BOT_RESPONSES.default;
+const INTENT_PATTERNS: Record<Intent, string[]> = {
+  BOOK_SESSION: ['book', 'booking', 'schedule', 'reserve', 'lesson', 'session', 'start session', 'class'],
+  CHOOSE_SUBJECT: ['subject', 'subjects', 'course', 'courses', 'study', 'available subjects', 'what can i study'],
+  URGENT_HELP: ['exam soon', 'last minute', 'urgent', 'late', 'need fast help', 'quick help', 'asap'],
+  HOW_IT_WORKS: ['how does it work', 'how it works', 'explain system', 'what do you do', 'process', 'steps'],
+};
+
+function normalizeInput(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function keywordMatchScore(input: string, pattern: string): number {
+  if (!input || !pattern) return 0;
+  if (input.includes(pattern)) return 1;
+
+  const inputTokens = input.split(' ');
+  const patternTokens = pattern.split(' ');
+  let matches = 0;
+
+  for (const p of patternTokens) {
+    const matched = inputTokens.some(token => {
+      if (token === p) return true;
+      if (token.length >= 3 && (token.startsWith(p) || p.startsWith(token))) return true;
+      return false;
+    });
+    if (matched) matches += 1;
+  }
+
+  return matches / patternTokens.length;
+}
+
+function detectIntent(input: string): Intent | null {
+  const normalized = normalizeInput(input);
+  if (!normalized) return null;
+
+  let bestIntent: Intent | null = null;
+  let bestScore = 0;
+
+  (Object.keys(INTENT_PATTERNS) as Intent[]).forEach(intent => {
+    const patterns = INTENT_PATTERNS[intent];
+    const score = Math.max(...patterns.map(p => keywordMatchScore(normalized, p)));
+    if (score > bestScore) {
+      bestScore = score;
+      bestIntent = intent;
+    }
+  });
+
+  return bestScore >= 0.55 ? bestIntent : null;
 }
 
 export default function ChatWidget() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [quickOptions, setQuickOptions] = useState<QuickOption[]>([]);
-  const [bookingSubject, setBookingSubject] = useState<string | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [redirected, setRedirected] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: 0, role: 'bot', text: BOT_RESPONSES.hello },
   ]);
@@ -55,77 +103,25 @@ export default function ChatWidget() {
     setMessages(prev => [...prev, { id: Date.now(), role: 'user', text }]);
   };
 
-  const startBookingFlow = () => {
-    pushBot('Great. Choose a subject and I will prefill it in booking for you.');
-    setQuickOptions(
-      subjects.map(subject => ({
-        id: `subject-${subject.id}`,
-        label: subject.name,
-        action: () => {
-          pushUser(subject.name);
-          setBookingSubject(subject.name);
-          pushBot(`Perfect. Now choose level for ${subject.name}.`);
-          setQuickOptions([
-            {
-              id: 'level-ol',
-              label: 'OL',
-              action: () => completeBooking(subject.name, 'OL'),
-            },
-            {
-              id: 'level-as',
-              label: 'AS',
-              action: () => completeBooking(subject.name, 'AS'),
-            },
-            {
-              id: 'level-al',
-              label: 'AL',
-              action: () => completeBooking(subject.name, 'AL'),
-            },
-          ]);
-        },
-      }))
-    );
-  };
+  const whatsappLink = process.env.NEXT_PUBLIC_WHATSAPP_CONTACT_URL || 'https://wa.me/201010294098';
 
-  const completeBooking = (subject: string, level: 'OL' | 'AS' | 'AL') => {
-    pushUser(level);
-    pushBot(`Done. Opening booking with ${subject} (${level}) selected first. You can add more subjects there.`);
-    setQuickOptions([]);
-    const url = `/booking?subject=${encodeURIComponent(subject)}&level=${level}`;
-    setTimeout(() => router.push(url), 500);
-  };
+  const handleIntent = (intent: Intent) => {
+    setFailedAttempts(0);
+    pushBot(BOT_RESPONSES[intent]);
 
-  const resetQuickOptions = () => {
-    setQuickOptions([
-      { id: 'book', label: 'Book a subject', action: startBookingFlow },
-      {
-        id: 'subjects',
-        label: 'View subjects',
-        action: () => {
-          pushUser('View subjects');
-          pushBot(BOT_RESPONSES.subjects);
-          setQuickOptions([]);
-        },
-      },
-      {
-        id: 'pricing',
-        label: 'Pricing',
-        action: () => {
-          pushUser('Pricing');
-          pushBot(BOT_RESPONSES.pricing);
-          setQuickOptions([]);
-        },
-      },
-      {
-        id: 'need-help',
-        label: 'Need help',
-        action: () => {
-          pushUser('Need help');
-          pushBot(BOT_RESPONSES.help);
-          setQuickOptions([]);
-        },
-      },
-    ]);
+    if (intent === 'BOOK_SESSION') {
+      setTimeout(() => router.push('/booking'), 500);
+      return;
+    }
+
+    if (intent === 'CHOOSE_SUBJECT') {
+      setTimeout(() => router.push('/booking?step=2'), 500);
+      return;
+    }
+
+    if (intent === 'URGENT_HELP') {
+      setTimeout(() => router.push('/booking?priority=urgent'), 500);
+    }
   };
 
   useEffect(() => {
@@ -133,32 +129,50 @@ export default function ChatWidget() {
   }, [messages]);
 
   useEffect(() => {
-    if (open) resetQuickOptions();
     if (!open) {
-      setQuickOptions([]);
-      setBookingSubject(null);
+      setFailedAttempts(0);
+      setRedirected(false);
+      setMessages([{ id: 0, role: 'bot', text: BOT_RESPONSES.hello }]);
     }
   }, [open]);
 
+  const handleNoMatch = () => {
+    setFailedAttempts(prev => {
+      const next = prev + 1;
+
+      if (next < 3) {
+        pushBot(BOT_RESPONSES.fallback);
+        return next;
+      }
+
+      setRedirected(true);
+      pushBot(`Need direct help? Contact us on WhatsApp. ${whatsappLink}`);
+      return next;
+    });
+  };
+
+  const processMessage = (text: string) => {
+    if (redirected) return;
+    const intent = detectIntent(text);
+    if (intent) {
+      handleIntent(intent);
+      return;
+    }
+    handleNoMatch();
+  };
+
   const send = () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || redirected) return;
     pushUser(trimmed);
     setInput('');
-    // Simulate bot typing delay
-    setTimeout(() => {
-      const lower = trimmed.toLowerCase();
-      if (lower.includes('book')) {
-        pushBot(BOT_RESPONSES.booking);
-        startBookingFlow();
-        return;
-      }
-      if (bookingSubject && (lower === 'ol' || lower === 'as' || lower === 'al')) {
-        completeBooking(bookingSubject, lower.toUpperCase() as 'OL' | 'AS' | 'AL');
-        return;
-      }
-      pushBot(getBotResponse(trimmed));
-    }, 600);
+    setTimeout(() => processMessage(trimmed), 350);
+  };
+
+  const onSuggestedClick = (option: SuggestedOption) => {
+    if (redirected) return;
+    pushUser(option.label);
+    setTimeout(() => handleIntent(option.intent), 220);
   };
 
   return (
@@ -217,20 +231,23 @@ export default function ChatWidget() {
                   </div>
                 </div>
               ))}
-              {quickOptions.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {quickOptions.map(option => (
-                    <button
-                      key={option.id}
-                      onClick={option.action}
-                      className="px-3 py-1.5 rounded-full text-xs bg-white border border-[#E2E8F0] text-[#64748B] hover:border-brand-orange/40 hover:text-[#1B2A44] transition-colors"
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
               <div ref={bottomRef} />
+            </div>
+
+            {/* Suggested messages (always visible) */}
+            <div className="px-3 py-2 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTED_OPTIONS.map(option => (
+                  <button
+                    key={option.id}
+                    onClick={() => onSuggestedClick(option)}
+                    disabled={redirected}
+                    className="px-3 py-1.5 rounded-full text-xs bg-white border border-[#E2E8F0] text-[#64748B] hover:border-brand-orange/40 hover:text-[#1B2A44] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Input */}
@@ -240,7 +257,8 @@ export default function ChatWidget() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && send()}
-                placeholder="Type a message…"
+                placeholder={redirected ? 'Chat ended. Use WhatsApp for direct help.' : 'Type a message...'}
+                disabled={redirected}
                 className="flex-1 bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm text-[#1B2A44] placeholder-[#94A3B8] focus:outline-none focus:border-brand-orange/50"
               />
               <button

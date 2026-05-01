@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 
-const BADGES = ['No hidden fees', 'Expert Cambridge tutors', 'Flexible scheduling', 'Progress tracking'];
+const BADGES = ['Max 6 students per group', 'Private sessions available', 'Built for last-minute recovery', 'Clear weekly outcomes'];
 
 export default function Hero() {
   const reduceMotion = useReducedMotion();
@@ -102,9 +102,9 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-extrabold leading-[1.08] tracking-tight mb-6"
         >
-          <span className="text-[#1B2A44]">Unlock Your</span>
+          <span className="text-[#1B2A44]">A Better System for</span>
           <br />
-          <span className="gradient-text">IGCSE Potential</span>
+          <span className="gradient-text">Faster IGCSE Results</span>
         </motion.h1>
 
         {/* Subheading */}
@@ -114,8 +114,8 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.20, ease: [0.22, 1, 0.36, 1] }}
           className="text-lg sm:text-xl text-[#334155] max-w-2xl mx-auto leading-relaxed mb-12"
         >
-          Premium, personalised tutoring for IGCSE students — with proven strategies,
-          expert tutors, and measurable progress every single week.
+          Start from any level and move forward with a simple, focused plan.
+          Small groups, private support, and clear progress every week.
         </motion.p>
 
         {/* CTA buttons */}

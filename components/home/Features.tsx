@@ -5,48 +5,48 @@ import { motion } from 'framer-motion';
 const FEATURES = [
   {
     icon: '🎓',
-    title: 'Cambridge-Trained Tutors',
-    description: 'Every tutor is a Cambridge IGCSE specialist with proven exam results and years of teaching experience.',
+    title: 'Results-First Learning System',
+    description: 'A clear method that moves students from confusion to exam-ready performance, step by step.',
     gradient: 'from-brand-orange/20 to-brand-orange/5',
     border: 'border-brand-orange/25',
     iconBg: 'from-brand-orange/30 to-brand-orange/10',
   },
   {
     icon: '📋',
-    title: 'Personalised Study Plans',
-    description: 'No generic lessons. We assess your weaknesses and build a custom roadmap targeting exactly where you need to improve.',
+    title: 'Targeted Study Plans',
+    description: 'No generic lessons. We focus on your weak topics first and build momentum fast.',
     gradient: 'from-[#7BBF2A]/15 to-[#7BBF2A]/5',
     border: 'border-[#7BBF2A]/25',
     iconBg: 'from-[#7BBF2A]/30 to-[#7BBF2A]/10',
   },
   {
     icon: '📈',
-    title: 'Weekly Progress Reports',
-    description: 'Transparent, measurable progress every week. You and your parents always know exactly where you stand.',
+    title: 'Weekly Progress Tracking',
+    description: 'You always know what improved, what is next, and what to revise before exams.',
     gradient: 'from-[#A5C8FF]/15 to-[#A5C8FF]/5',
     border: 'border-[#A5C8FF]/25',
     iconBg: 'from-[#A5C8FF]/30 to-[#A5C8FF]/10',
   },
   {
     icon: '🕐',
-    title: 'Flexible Scheduling',
-    description: 'Morning, evening, weekdays or weekends — sessions fit around your school timetable, not the other way around.',
+    title: 'Flexible Booking',
+    description: 'Book in under a minute and choose times that fit school, revision, and deadlines.',
     gradient: 'from-[#FFD166]/15 to-[#FFD166]/5',
     border: 'border-[#FFD166]/25',
     iconBg: 'from-[#FFD166]/30 to-[#FFD166]/10',
   },
   {
     icon: '💬',
-    title: 'Always-On Support',
-    description: 'WhatsApp support between sessions for quick questions. Your tutor stays available when exam pressure peaks.',
+    title: 'Fast Help Before Exams',
+    description: 'Urgent support is available when exams are close and you need quick, focused recovery.',
     gradient: 'from-brand-orange/15 to-brand-orange/5',
     border: 'border-brand-orange/20',
     iconBg: 'from-brand-orange/25 to-brand-orange/8',
   },
   {
     icon: '🏆',
-    title: '95% Success Rate',
-    description: 'Our students consistently outperform their predicted grades. We don\'t just teach — we build exam-winning strategies.',
+    title: 'Built for Real Improvement',
+    description: 'Works for both struggling students and high achievers who want a stronger final grade.',
     gradient: 'from-[#7BBF2A]/15 to-[#7BBF2A]/5',
     border: 'border-[#7BBF2A]/20',
     iconBg: 'from-[#7BBF2A]/25 to-[#7BBF2A]/8',
@@ -75,11 +75,11 @@ export default function Features() {
             Why El7a2ny
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold text-[#1B2A44] mt-4 mb-5 leading-tight">
-            Everything You Need to
-            <span className="gradient-text"> Succeed</span>
+            A Platform Designed for
+            <span className="gradient-text"> Exam Results</span>
           </h2>
           <p className="text-[#64748B] max-w-xl mx-auto text-lg">
-            We built El7a2ny around one goal: giving every IGCSE student an unfair advantage.
+            Simple flow, fast decisions, and consistent progress you can feel week by week.
           </p>
         </motion.div>
 

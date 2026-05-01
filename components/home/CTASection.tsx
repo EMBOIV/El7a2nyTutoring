@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 
-const TRUST = ['⭐ 4.9/5 student rating', '500+ students helped', 'Free first session', 'No long-term contract'];
+const TRUST = ['Max 6 students per group', 'Private sessions available', 'Works for last-minute prep', 'Simple and fast process'];
 
 export default function CTASection() {
   const reduceMotion = useReducedMotion();
@@ -35,14 +35,14 @@ export default function CTASection() {
           </span>
 
           <h2 className="text-4xl md:text-6xl font-extrabold text-[#1B2A44] mt-4 mb-6 leading-[1.05]">
-            Ready to Achieve
+            Ready for
             <br />
-            <span className="gradient-text">Your Best Grade?</span>
+            <span className="gradient-text">Faster Exam Progress?</span>
           </h2>
 
           <p className="text-[#334155] text-xl mb-12 max-w-xl mx-auto leading-relaxed">
-            Join 500+ IGCSE students who transformed their grades with El7a2ny.
-            Your first session is completely free.
+            We are former IGCSE students who built the platform we wish we had:
+            simple, focused, and effective from the first session.
           </p>
 
           <div className="flex flex-wrap gap-4 justify-center mb-12">

@@ -15,12 +15,6 @@ const FOOTER_LINKS = {
     { label: 'Login',     href: '/auth' },
     { label: 'Sign Up',   href: '/auth?tab=signup' },
   ],
-  Subjects: [
-    { label: 'Mathematics', href: '/subjects' },
-    { label: 'Physics',     href: '/subjects' },
-    { label: 'Chemistry',   href: '/subjects' },
-    { label: 'Biology',     href: '/subjects' },
-  ],
 };
 
 const SOCIALS = [
@@ -60,7 +54,7 @@ export default function Footer() {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-orange/20 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center mb-5">
@@ -75,7 +69,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-[#64748B] text-sm leading-relaxed max-w-xs mb-6">
-              Expert, personalised IGCSE tutoring that helps motivated students achieve their potential. Proven results, dedicated tutors.
+              A focused system that gets students results fast. Max 6 per group, private sessions available, and clear next steps from day one.
             </p>
             <div className="flex items-center gap-3">
               {SOCIALS.map(s => (
