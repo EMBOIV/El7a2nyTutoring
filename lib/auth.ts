@@ -5,6 +5,9 @@ export const TEACHERS: Record<string, { subjects: string[] }> = {
   'ali.a.embaby@hotmail.com': {
     subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Human Biology', 'Information Technology', 'Computer Science', 'Accounting', 'Business Studies', 'Economics', 'Combined Science', 'Arabic', 'National Arabic'],
   },
+  'ali.a.embaby@gmail.com': {
+    subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Human Biology', 'Information Technology', 'Computer Science', 'Accounting', 'Business Studies', 'Economics', 'Combined Science', 'Arabic', 'National Arabic'],
+  },
 };
 
 export const TEACHER_EMAILS: string[] = Object.keys(TEACHERS);
