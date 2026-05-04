@@ -27,7 +27,7 @@ export interface AppUser {
   email: string;
   phone: string;
   password: string;
-  role: UserRole;
+  role: UserRole; 
   avatar?: string;
 }
 
