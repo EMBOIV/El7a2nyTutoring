@@ -145,7 +145,7 @@ export default function BookingPage() {
     setSelectedSubjects(prev => {
       const exists = prev.find(i => i.subject === subject.name);
       if (exists) return prev.filter(i => i.subject !== subject.name);
-      return [{ subject: subject.name, emoji: subject.emoji, level: '', examType: '', examSession: '' }];
+      return [...prev, { subject: subject.name, emoji: subject.emoji, level: '', examType: '', examSession: '' }];
     });
   };
 
@@ -159,6 +159,16 @@ export default function BookingPage() {
     else if (info.phone.replace(/\D/g, '').length < 6) e.phone = 'Please enter a valid phone number';
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const sendLeadEmail = () => {
+    const digits = info.phone.replace(/^0/, '').replace(/\D/g, '');
+    const fullPhone = `${countryCode}${digits}`;
+    void fetch('/api/booking/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: info.name.trim(), phone: fullPhone }),
+    });
   };
 
   const submitBooking = async () => {
@@ -361,11 +371,11 @@ export default function BookingPage() {
                         />
                       </div>
                       {errors.phone && <p className="text-red-400 text-xs mt-1.5">{errors.phone}</p>}
-                      <p className="text-[#94A3B8] text-xs mt-1.5">{selectedCountry.name} ({selectedCountry.code}) — auto-detected from number</p>
+
                     </div>
                   </div>
                   <div className="mt-6 flex justify-end">
-                    <button onClick={() => validateInfo() && setStep(2)} className="btn-primary px-8 py-3 text-sm">Continue</button>
+                    <button onClick={() => { if (validateInfo()) { sendLeadEmail(); setStep(2); } }} className="btn-primary px-8 py-3 text-sm">Continue</button>
                   </div>
                 </motion.div>
               )}
@@ -442,7 +452,7 @@ export default function BookingPage() {
                       disabled={selectedCount === 0}
                       className="btn-primary px-8 py-3 text-sm disabled:opacity-40"
                     >
-                      Continue with {selectedCount} Subject
+                      Continue with {selectedCount} Subject{selectedCount !== 1 ? 's' : ''}
                     </button>
                   </div>
                 </motion.div>
