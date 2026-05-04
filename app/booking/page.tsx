@@ -7,22 +7,22 @@ import { EDUCATION_SYSTEMS, subjects as allSubjects } from '@/lib/subjects';
 import type { EducationSystem } from '@/lib/subjects';
 import { useLang } from '@/components/ui/LanguageProvider';
 
-interface Country { code: string; name: string; flag: string }
+interface Country { code: string; name: string; abbr: string }
 const COUNTRIES: Country[] = [
-  { code: '+20',  name: 'Egypt',        flag: '\U0001f1ea\U0001f1ec' },
-  { code: '+966', name: 'Saudi Arabia', flag: '\U0001f1f8\U0001f1e6' },
-  { code: '+971', name: 'UAE',          flag: '\U0001f1e6\U0001f1ea' },
-  { code: '+965', name: 'Kuwait',       flag: '\U0001f1f0\U0001f1fc' },
-  { code: '+974', name: 'Qatar',        flag: '\U0001f1f6\U0001f1e6' },
-  { code: '+973', name: 'Bahrain',      flag: '\U0001f1e7\U0001f1ed' },
-  { code: '+968', name: 'Oman',         flag: '\U0001f1f4\U0001f1f2' },
-  { code: '+962', name: 'Jordan',       flag: '\U0001f1ef\U0001f1f4' },
-  { code: '+961', name: 'Lebanon',      flag: '\U0001f1f1\U0001f1e7' },
-  { code: '+44',  name: 'UK',           flag: '\U0001f1ec\U0001f1e7' },
-  { code: '+1',   name: 'USA / Canada', flag: '\U0001f1fa\U0001f1f8' },
-  { code: '+49',  name: 'Germany',      flag: '\U0001f1e9\U0001f1ea' },
-  { code: '+33',  name: 'France',       flag: '\U0001f1eb\U0001f1f7' },
-  { code: '+61',  name: 'Australia',    flag: '\U0001f1e6\U0001f1fa' },
+  { code: '+20',  name: 'Egypt',        abbr: 'EG' },
+  { code: '+966', name: 'Saudi Arabia', abbr: 'SA' },
+  { code: '+971', name: 'UAE',          abbr: 'AE' },
+  { code: '+965', name: 'Kuwait',       abbr: 'KW' },
+  { code: '+974', name: 'Qatar',        abbr: 'QA' },
+  { code: '+973', name: 'Bahrain',      abbr: 'BH' },
+  { code: '+968', name: 'Oman',         abbr: 'OM' },
+  { code: '+962', name: 'Jordan',       abbr: 'JO' },
+  { code: '+961', name: 'Lebanon',      abbr: 'LB' },
+  { code: '+44',  name: 'UK',           abbr: 'GB' },
+  { code: '+1',   name: 'USA / Canada', abbr: 'US' },
+  { code: '+49',  name: 'Germany',      abbr: 'DE' },
+  { code: '+33',  name: 'France',       abbr: 'FR' },
+  { code: '+61',  name: 'Australia',    abbr: 'AU' },
 ];
 
 function detectCountry(phone: string): Country | null {
@@ -194,7 +194,7 @@ export default function BookingPage() {
                   <div className="flex gap-2">
                     <div className="relative">
                       <button type="button" onClick={() => setCountryOpen(o => !o)} className="h-[46px] px-3 flex items-center gap-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm font-medium text-[#1B2A44] hover:border-[#CBD5E1] transition-colors whitespace-nowrap">
-                        <span className="text-base">{selectedCountry.flag}</span>
+                        <span className="text-[10px] font-bold text-[#64748B] tracking-wide">{selectedCountry.abbr}</span>
                         <span>{selectedCountry.code}</span>
                         <svg className="w-3.5 h-3.5 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                       </button>
@@ -203,7 +203,7 @@ export default function BookingPage() {
                           <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="absolute top-full mt-1 left-0 z-50 bg-white border border-[#E2E8F0] rounded-xl shadow-lg overflow-y-auto max-h-52 min-w-[190px]">
                             {COUNTRIES.map(c => (
                               <button key={c.code} type="button" onClick={() => { setForm(f => ({ ...f, countryCode: c.code })); setCountryOpen(false); }} className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left hover:bg-[#F8FAFC] transition-colors ${c.code === form.countryCode ? 'text-brand-orange font-medium bg-brand-orange/5' : 'text-[#334155]'}`}>
-                                <span className="text-base">{c.flag}</span>
+                                <span className="text-[10px] font-bold text-[#64748B] w-6 tracking-wide">{c.abbr}</span>
                                 <span className="font-medium">{c.code}</span>
                                 <span className="text-[#64748B] text-xs">{c.name}</span>
                               </button>
@@ -215,7 +215,7 @@ export default function BookingPage() {
                     <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder={t.booking.phonePlaceholder} className={`input-field flex-1 ${errors.phone ? 'border-red-500/60' : ''}`} />
                   </div>
                   {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
-                  <p className="text-[#94A3B8] text-xs mt-1.5">{selectedCountry.flag} {selectedCountry.name} ({selectedCountry.code}) \u2014 auto-detected</p>
+                  <p className="text-[#94A3B8] text-xs mt-1.5">{selectedCountry.name} ({selectedCountry.code}) — auto-detected</p>
                 </div>
               </motion.div>
             )}
