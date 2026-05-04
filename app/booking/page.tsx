@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { stepSlide } from '@/lib/animations';
 import { EDUCATION_SYSTEMS, subjects as allSubjects } from '@/lib/subjects';
 import type { EducationSystem } from '@/lib/subjects';
@@ -69,7 +69,6 @@ function StepIndicator({ step, labels }: { step: Step; labels: string[] }) {
 }
 
 export default function BookingPage() {
-  const reduceMotion = useReducedMotion();
   const { t, isRTL } = useLang();
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormState>({ name:'', phone:'', countryCode:'+20', system:'', selectedSubjects:[], date:'', time:'', notes:'', email:'' });
@@ -183,7 +182,7 @@ export default function BookingPage() {
         <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_4px_24px_rgba(27,42,68,0.08)] overflow-hidden">
           <AnimatePresence mode="wait">
             {step === 1 && (
-              <motion.div key="step1" {...stepSlide(reduceMotion)} className="p-6 sm:p-8 space-y-5">
+              <motion.div key="step1" {...stepSlide} className="p-6 sm:p-8 space-y-5">
                 <h2 className="text-lg font-bold text-[#1B2A44]">{t.booking.step1}</h2>
                 <div>
                   <label className="block text-sm font-medium text-[#334155] mb-1.5">{t.booking.fullName} <span className="text-red-400">*</span></label>
@@ -222,7 +221,7 @@ export default function BookingPage() {
             )}
 
             {step === 2 && (
-              <motion.div key="step2" {...stepSlide(reduceMotion)} className="p-6 sm:p-8 space-y-5">
+              <motion.div key="step2" {...stepSlide} className="p-6 sm:p-8 space-y-5">
                 <h2 className="text-lg font-bold text-[#1B2A44]">{t.booking.step2}</h2>
                 <div>
                   <label className="block text-sm font-medium text-[#334155] mb-2">{t.booking.selectSystem} <span className="text-red-400">*</span></label>
@@ -268,7 +267,7 @@ export default function BookingPage() {
             )}
 
             {step === 3 && (
-              <motion.div key="step3" {...stepSlide(reduceMotion)} className="p-6 sm:p-8 space-y-5">
+              <motion.div key="step3" {...stepSlide} className="p-6 sm:p-8 space-y-5">
                 <h2 className="text-lg font-bold text-[#1B2A44]">{t.booking.step3}</h2>
                 <div>
                   <label className="block text-sm font-medium text-[#334155] mb-1.5">{t.booking.preferredDate} <span className="text-red-400">*</span></label>
@@ -292,7 +291,7 @@ export default function BookingPage() {
             )}
 
             {step === 4 && (
-              <motion.div key="step4" {...stepSlide(reduceMotion)} className="p-6 sm:p-8 space-y-4">
+              <motion.div key="step4" {...stepSlide} className="p-6 sm:p-8 space-y-4">
                 <h2 className="text-lg font-bold text-[#1B2A44]">{t.booking.reviewTitle}</h2>
                 <div className="divide-y divide-[#F1F5F9]">
                   {[
@@ -314,7 +313,7 @@ export default function BookingPage() {
             )}
 
             {step === 5 && (
-              <motion.div key="step5" {...stepSlide(reduceMotion)} className="p-6 sm:p-8 space-y-5">
+              <motion.div key="step5" {...stepSlide} className="p-6 sm:p-8 space-y-5">
                 <h2 className="text-lg font-bold text-[#1B2A44]">{t.booking.step5}</h2>
                 <p className="text-sm text-[#64748B]">Leave your email to receive a booking confirmation. This step is optional.</p>
                 <div>
