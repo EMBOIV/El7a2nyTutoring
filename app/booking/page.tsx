@@ -3,21 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { stepSlide } from '@/lib/animations';
-import {
-  addSession,
-  clearSession,
-  getSessions,
-  getRoleForEmail,
-  getUsers,
-  isValidPhone,
-  normalizeEmail,
-  normalizePhone,
-  saveSession,
-  saveUsers,
-} from '@/lib/auth';
-import type { AppUser } from '@/lib/auth';
 import { subjects } from '@/lib/subjects';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
@@ -25,73 +12,66 @@ type LevelOption = 'OL' | 'AS' | 'A2' | 'AL';
 type ExamType = 'Cambridge' | 'Edexcel';
 type ExamSession = 'Jan/Feb 2025' | 'May/Jun 2025' | 'Oct/Nov 2025' | 'Jan/Feb 2026' | 'May/Jun 2026' | 'Oct/Nov 2026' | 'Jan/Feb 2027' | 'May/Jun 2027';
 
-interface ContactInfo {
-  name: string;
-  email: string;
-  phone: string;
-}
+interface ContactInfo { name: string; phone: string; }
 
-interface UserSession {
-  name: string;
-  email: string;
-  phone?: string;
-}
+interface Country { code: string; name: string; abbr: string; }
 
 interface SubjectItem {
-  id: string;
-  name: string;
-  emoji: string;
-  tagline: string;
-  category?: string;
+  id: string; name: string; emoji: string; tagline: string; category?: string;
 }
 
 interface SubjectSelection {
-  subject: string;
-  emoji: string;
-  level: LevelOption | '';
-  examType: ExamType | '';
-  examSession: ExamSession | '';
+  subject: string; emoji: string;
+  level: LevelOption | ''; examType: ExamType | ''; examSession: ExamSession | '';
 }
 
-const STEP_LABELS = ['Subjects', 'Session Setup', 'Your Info', 'Review'];
+const STEP_LABELS = ['Your Info', 'Subjects', 'Session Setup', 'Review'];
 const LEVEL_OPTIONS: LevelOption[] = ['OL', 'AS', 'A2', 'AL'];
 const EXAM_TYPES: ExamType[] = ['Cambridge', 'Edexcel'];
-const EXAM_SESSIONS: ExamSession[] = ['Jan/Feb 2025', 'May/Jun 2025', 'Oct/Nov 2025', 'Jan/Feb 2026', 'May/Jun 2026', 'Oct/Nov 2026', 'Jan/Feb 2027', 'May/Jun 2027'];
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EXAM_SESSIONS: ExamSession[] = [
+  'Jan/Feb 2025', 'May/Jun 2025', 'Oct/Nov 2025',
+  'Jan/Feb 2026', 'May/Jun 2026', 'Oct/Nov 2026',
+  'Jan/Feb 2027', 'May/Jun 2027',
+];
 
-function LabeledInput({
-  id, label, type, value, onChange, hasError,
-}: {
-  id: string; label: string; type: string; value: string; onChange: (v: string) => void; hasError?: boolean;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-[#64748B] mb-1.5">{label}</label>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={type === 'email' ? 'your@email.com' : type === 'tel' ? '+201010294098' : 'Your full name'}
-        className={`input-field ${hasError ? 'border-red-500/60 focus:border-red-500/80' : ''}`}
-      />
-    </div>
-  );
+const COUNTRIES: Country[] = [
+  { code: '+20',  name: 'Egypt',        abbr: 'EG' },
+  { code: '+966', name: 'Saudi Arabia', abbr: 'SA' },
+  { code: '+971', name: 'UAE',          abbr: 'AE' },
+  { code: '+965', name: 'Kuwait',       abbr: 'KW' },
+  { code: '+974', name: 'Qatar',        abbr: 'QA' },
+  { code: '+973', name: 'Bahrain',      abbr: 'BH' },
+  { code: '+968', name: 'Oman',         abbr: 'OM' },
+  { code: '+962', name: 'Jordan',       abbr: 'JO' },
+  { code: '+961', name: 'Lebanon',      abbr: 'LB' },
+  { code: '+44',  name: 'UK',           abbr: 'GB' },
+  { code: '+1',   name: 'USA / Canada', abbr: 'US' },
+  { code: '+49',  name: 'Germany',      abbr: 'DE' },
+  { code: '+33',  name: 'France',       abbr: 'FR' },
+  { code: '+61',  name: 'Australia',    abbr: 'AU' },
+];
+
+function detectCountry(phone: string): Country | null {
+  const d = phone.replace(/\D/g, '');
+  if (!d) return null;
+  if (/^0?1[0-5]/.test(d)) return COUNTRIES.find(c => c.code === '+20') ?? null;
+  if (/^0?5/.test(d) && d.length >= 3) return COUNTRIES.find(c => c.code === '+966') ?? null;
+  return null;
 }
 
 export default function BookingPage() {
   const reduceMotion = useReducedMotion();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [apiError, setApiError] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
 
-  const [loggedInUser, setLoggedInUser] = useState<UserSession | null>(null);
-  const [info, setInfo] = useState<ContactInfo>({ name: '', email: '', phone: '' });
+  const [info, setInfo] = useState<ContactInfo>({ name: '', phone: '' });
+  const [countryCode, setCountryCode] = useState('+20');
+  const [countryOpen, setCountryOpen] = useState(false);
 
   const [subjectOptions, setSubjectOptions] = useState<SubjectItem[]>([]);
   const [subjectsLoading, setSubjectsLoading] = useState(true);
@@ -99,37 +79,24 @@ export default function BookingPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectSelection[]>([]);
 
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupLoading, setSignupLoading] = useState(false);
-  const [signupError, setSignupError] = useState('');
-  const [signupSuccess, setSignupSuccess] = useState(false);
+  const selectedCountry = COUNTRIES.find(c => c.code === countryCode) ?? COUNTRIES[0];
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('el7a2ny_session');
-      if (raw) {
-        const user = JSON.parse(raw) as UserSession;
-        if (user?.name && user?.email) {
-          setLoggedInUser(user);
-          setInfo({ name: user.name, email: user.email, phone: user.phone ?? '' });
-        }
-      }
-    } catch {
-      // Ignore invalid session payload.
-    }
-  }, []);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [step]);
 
+  // Auto-detect country from phone digits
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [step]);
+    const detected = detectCountry(info.phone);
+    if (detected && detected.code !== countryCode) setCountryCode(detected.code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [info.phone]);
 
   useEffect(() => {
     void (async () => {
       setSubjectsLoading(true);
       try {
-        const response = await fetch('/api/subjects');
-        const payload = (await response.json()) as { subjects?: SubjectItem[] };
-        if (response.ok && Array.isArray(payload.subjects)) {
+        const res = await fetch('/api/subjects');
+        const payload = (await res.json()) as { subjects?: SubjectItem[] };
+        if (res.ok && Array.isArray(payload.subjects)) {
           setSubjectOptions(payload.subjects);
         } else {
           setSubjectOptions(subjects.map(s => ({ id: s.id, name: s.name, emoji: s.emoji, tagline: s.tagline, category: 'All' })));
@@ -146,125 +113,75 @@ export default function BookingPage() {
     const preSubject = searchParams.get('subject');
     const preLevel = searchParams.get('level');
     if (!preSubject) return;
-
     const matched = subjects.find(s => s.name.toLowerCase() === preSubject.toLowerCase());
     if (!matched) return;
-
-    const level: LevelOption | '' = preLevel === 'OL' || preLevel === 'AS' || preLevel === 'A2' || preLevel === 'AL' ? preLevel : '';
-
+    const level: LevelOption | '' = (['OL', 'AS', 'A2', 'AL'] as string[]).includes(preLevel ?? '') ? preLevel as LevelOption : '';
     setSelectedSubjects(prev => {
-      if (prev.some(item => item.subject === matched.name)) return prev;
+      if (prev.some(i => i.subject === matched.name)) return prev;
       return [{ subject: matched.name, emoji: matched.emoji, level, examType: '', examSession: '' }];
     });
   }, [searchParams]);
 
   const categories = useMemo(() => {
-    const values = new Set(subjectOptions.map(subject => subject.category || 'General'));
-    return ['All', ...Array.from(values)];
+    const vals = new Set(subjectOptions.map(s => s.category || 'General'));
+    return ['All', ...Array.from(vals)];
   }, [subjectOptions]);
 
   const filteredSubjects = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return subjectOptions.filter(subject => {
-      const category = subject.category || 'General';
-      if (activeCategory !== 'All' && category !== activeCategory) return false;
+    return subjectOptions.filter(s => {
+      const cat = s.category || 'General';
+      if (activeCategory !== 'All' && cat !== activeCategory) return false;
       if (!q) return true;
-      return `${subject.name} ${subject.tagline} ${category}`.toLowerCase().includes(q);
+      return `${s.name} ${s.tagline} ${cat}`.toLowerCase().includes(q);
     });
   }, [subjectOptions, search, activeCategory]);
 
   const selectedCount = selectedSubjects.length;
-  const configuredAll = selectedSubjects.length > 0 && selectedSubjects.every(subject => subject.level && subject.examType && subject.examSession);
-
+  const configuredAll = selectedCount > 0 && selectedSubjects.every(s => s.level && s.examType && s.examSession);
   const progressScale = (step - 1) / 3;
 
   const toggleSubject = (subject: SubjectItem) => {
     setSelectedSubjects(prev => {
-      const exists = prev.find(item => item.subject === subject.name);
-      if (exists) return prev.filter(item => item.subject !== subject.name);
-      // Single subject booking only.
+      const exists = prev.find(i => i.subject === subject.name);
+      if (exists) return prev.filter(i => i.subject !== subject.name);
       return [{ subject: subject.name, emoji: subject.emoji, level: '', examType: '', examSession: '' }];
     });
   };
 
-  const updateSubjectSelection = (subjectName: string, patch: Partial<SubjectSelection>) => {
-    setSelectedSubjects(prev => prev.map(item => item.subject === subjectName ? { ...item, ...patch } : item));
-  };
+  const updateSubjectSelection = (name: string, patch: Partial<SubjectSelection>) =>
+    setSelectedSubjects(prev => prev.map(i => i.subject === name ? { ...i, ...patch } : i));
 
   const validateInfo = () => {
-    const e: { name?: string; email?: string; phone?: string } = {};
-    if (!loggedInUser) {
-      if (!info.name.trim()) e.name = 'Full name is required';
-      if (!info.email.trim()) e.email = 'Email is required';
-      else if (!EMAIL_RE.test(info.email)) e.email = 'Please enter a valid email address';
-      if (!info.phone.trim()) e.phone = 'WhatsApp number is required';
-      else if (!isValidPhone(info.phone)) e.phone = 'Use country code format, e.g. +201010294098';
-    }
+    const e: { name?: string; phone?: string } = {};
+    if (!info.name.trim()) e.name = 'Full name is required';
+    if (!info.phone.trim()) e.phone = 'Phone number is required';
+    else if (info.phone.replace(/\D/g, '').length < 6) e.phone = 'Please enter a valid phone number';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const submitBooking = async () => {
     setApiError('');
-    if (!validateInfo()) {
-      setStep(3);
-      return;
-    }
-
-    const name = loggedInUser?.name ?? info.name;
-    const email = loggedInUser?.email ?? info.email;
-    const phone = normalizePhone(loggedInUser?.phone ?? info.phone);
-
-    const duplicatePending = getSessions().some(existing => {
-      if (existing.status !== 'pending') return false;
-      if (normalizeEmail(existing.studentEmail) !== normalizeEmail(email)) return false;
-      return selectedSubjects.some(subject => {
-        const expectedNotes = `Level: ${subject.level} | Exam Type: ${subject.examType} | Exam Session: ${subject.examSession}`;
-        return existing.subject === subject.subject && existing.notes === expectedNotes;
-      });
-    });
-
-    if (duplicatePending) {
-      setApiError('You already have this session pending. Please wait for confirmation or rejection before booking it again.');
-      return;
-    }
-
     setLoading(true);
     try {
-      const response = await fetch('/api/booking', {
+      const digits = info.phone.replace(/^0/, '').replace(/\D/g, '');
+      const fullPhone = `${countryCode}${digits}`;
+      const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          email,
-          phone,
-          subjects: selectedSubjects.map(subject => ({
-            subject: subject.subject,
-            session: subject.level,
-            examSession: `${subject.examType} | ${subject.examSession}`,
+          name: info.name.trim(),
+          phone: fullPhone,
+          subjects: selectedSubjects.map(s => ({
+            subject: s.subject,
+            session: s.level,
+            examSession: `${s.examType} | ${s.examSession}`,
           })),
         }),
       });
-
-      const payload = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(payload?.error || 'Booking request failed');
-
-      const today = new Date().toISOString().split('T')[0];
-      selectedSubjects.forEach(subject => {
-        addSession({
-          id: crypto.randomUUID(),
-          studentEmail: email,
-          studentName: name,
-          subject: subject.subject,
-          date: today,
-          time: '',
-          sessionType: 'Online',
-          status: 'pending',
-          notes: `Level: ${subject.level} | Exam Type: ${subject.examType} | Exam Session: ${subject.examSession}`,
-          createdAt: new Date().toISOString(),
-        });
-      });
-
+      const payload = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(payload?.error || 'Booking request failed');
       setSuccess(true);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -273,81 +190,14 @@ export default function BookingPage() {
     }
   };
 
-  const createOptionalAccount = async () => {
-    if (loggedInUser) return;
-
-    setSignupError('');
-    if (signupPassword.trim().length < 8) {
-      setSignupError('Use at least 8 characters for your password.');
-      return;
-    }
-
-    const normalizedEmailValue = normalizeEmail(info.email);
-    const normalizedPhoneValue = normalizePhone(info.phone);
-    const users = getUsers();
-    const exists = users.find(user => user.email === normalizedEmailValue || normalizePhone(user.phone) === normalizedPhoneValue);
-
-    if (exists) {
-      setSignupError('You already have an account with this email or phone. Use Sign In.');
-      return;
-    }
-
-    setSignupLoading(true);
-    try {
-      const role = getRoleForEmail(normalizedEmailValue);
-      const newUser: AppUser = {
-        name: info.name.trim(),
-        email: normalizedEmailValue,
-        phone: normalizedPhoneValue,
-        password: signupPassword,
-        role,
-      };
-
-      saveUsers([...users, newUser]);
-      saveSession({ name: newUser.name, email: newUser.email, phone: newUser.phone, role });
-
-      fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newUser.name, email: newUser.email, phone: newUser.phone }),
-      }).catch(() => {});
-
-      setSignupSuccess(true);
-      setLoggedInUser({ name: newUser.name, email: newUser.email, phone: newUser.phone });
-    } finally {
-      setSignupLoading(false);
-    }
-  };
-
   const resetAll = () => {
-    setStep(1);
-    setLoading(false);
-    setSuccess(false);
-    setApiError('');
-    setErrors({});
-    setSearch('');
-    setActiveCategory('All');
-    setSelectedSubjects([]);
-    setSignupPassword('');
-    setSignupError('');
-    setSignupSuccess(false);
-    setInfo(loggedInUser
-      ? { name: loggedInUser.name, email: loggedInUser.email, phone: loggedInUser.phone ?? '' }
-      : { name: '', email: '', phone: '' });
-  };
-
-  const handleNotYou = () => {
-    clearSession();
-    setLoggedInUser(null);
-    setInfo({ name: '', email: '', phone: '' });
-    router.push('/auth?tab=login');
+    setStep(1); setLoading(false); setSuccess(false); setApiError(''); setErrors({});
+    setInfo({ name: '', phone: '' }); setCountryCode('+20');
+    setSearch(''); setActiveCategory('All'); setSelectedSubjects([]);
   };
 
   if (success) {
-    const name = loggedInUser?.name ?? info.name;
-    const email = loggedInUser?.email ?? info.email;
-    const phone = loggedInUser?.phone ?? info.phone;
-
+    const fullPhone = `${countryCode}${info.phone.replace(/^0/, '').replace(/\D/g, '')}`;
     return (
       <div className="pt-[70px] min-h-screen flex items-center justify-center">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl w-full container-pad">
@@ -361,64 +211,26 @@ export default function BookingPage() {
               </motion.svg>
               <p className="text-brand-success font-semibold text-lg">Booking request sent successfully ✅</p>
             </div>
-
             <p className="text-[#334155] text-sm mb-4">We received your request. Our team will contact you shortly to confirm details.</p>
-
             <div className="rounded-xl bg-white border border-brand-grayMuted p-4 text-sm mb-5">
               <div className="flex justify-between py-1 border-b border-brand-grayMuted">
                 <span className="text-[#334155]">Name</span>
-                <span className="text-brand-navy font-semibold">{name}</span>
+                <span className="text-brand-navy font-semibold">{info.name}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-brand-grayMuted">
-                <span className="text-[#334155]">Email</span>
-                <span className="text-brand-navy font-semibold">{email}</span>
+                <span className="text-[#334155]">Phone</span>
+                <span className="text-brand-navy font-semibold">{fullPhone}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-brand-grayMuted">
-                <span className="text-[#334155]">WhatsApp</span>
-                <span className="text-brand-navy font-semibold">{phone}</span>
-              </div>
-              {selectedSubjects.map((subject, index) => (
-                <div key={subject.subject} className={`py-1 ${index < selectedSubjects.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
+              {selectedSubjects.map((s, i) => (
+                <div key={s.subject} className={`py-1 ${i < selectedSubjects.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
                   <div className="flex justify-between">
-                    <span className="text-[#334155]">{subject.emoji} {subject.subject}</span>
-                    <span className="text-brand-navy font-semibold">{subject.level}</span>
+                    <span className="text-[#334155]">{s.emoji} {s.subject}</span>
+                    <span className="text-brand-navy font-semibold">{s.level}</span>
                   </div>
-                  <div className="flex justify-end text-xs text-[#64748B]">{subject.examType} • {subject.examSession}</div>
+                  <div className="flex justify-end text-xs text-[#64748B]">{s.examType} • {s.examSession}</div>
                 </div>
               ))}
             </div>
-
-            {!loggedInUser && (
-              <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 mb-4">
-                <p className="text-brand-navy font-semibold text-sm">Save your details for next time (Optional)</p>
-                <p className="text-[#64748B] text-xs mt-1 mb-3">
-                  Create a password to turn this booking into an account. Your data stays private and is only used for your tutoring journey.
-                </p>
-
-                {signupSuccess ? (
-                  <p className="text-sm text-brand-green font-medium">Account created successfully. You can now sign in anytime.</p>
-                ) : (
-                  <>
-                    <input
-                      type="password"
-                      value={signupPassword}
-                      onChange={e => setSignupPassword(e.target.value)}
-                      placeholder="Create password (min 8 chars)"
-                      className="input-field"
-                    />
-                    {signupError && <p className="text-red-500 text-xs mt-2">{signupError}</p>}
-                    <button
-                      onClick={createOptionalAccount}
-                      disabled={signupLoading}
-                      className="btn-primary mt-3 px-5 py-2.5 text-sm"
-                    >
-                      {signupLoading ? 'Saving...' : 'Save My Details Securely'}
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-
             <button onClick={resetAll} className="btn-primary mt-1 px-6 py-3 text-sm">Book Another Request</button>
           </div>
         </motion.div>
@@ -438,24 +250,15 @@ export default function BookingPage() {
           </div>
           <p className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Fast Booking</p>
           <h1 className="text-4xl md:text-5xl font-extrabold text-brand-navy mt-3 mb-4">
-            Subject-First Booking <span className="gradient-text">in 4 Steps</span>
+            Book a Free Session <span className="gradient-text">in 4 Steps</span>
           </h1>
-          <p className="text-[#334155]">Choose subjects first, then configure each one quickly without long scrolling.</p>
+          <p className="text-[#334155]">Tell us about yourself first, then pick your subject and configure your session.</p>
         </div>
       </section>
 
       <section className="pb-24">
         <div className="max-w-4xl mx-auto container-pad">
           <div className="glass rounded-2xl p-5 md:p-8 border border-brand-grayMuted shadow-sm">
-            {loggedInUser && (
-              <div className="mb-6 flex items-center justify-between rounded-xl bg-brand-green/10 border border-brand-green/30 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-brand-green text-lg">✓</span>
-                  <span className="text-sm text-brand-navy">Booking as <strong>{loggedInUser.name}</strong> ({loggedInUser.email}{loggedInUser.phone ? ` · ${loggedInUser.phone}` : ''})</span>
-                </div>
-                <button onClick={handleNotYou} className="text-xs text-[#64748B] hover:text-brand-orange underline">Not you?</button>
-              </div>
-            )}
 
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm text-[#64748B] font-medium">Step {step} of 4</p>
@@ -467,7 +270,6 @@ export default function BookingPage() {
                 const current = (index + 1) as Step;
                 const active = step === current;
                 const done = step > current;
-
                 return (
                   <div key={label} className="flex-1 flex flex-col items-center">
                     <motion.div
@@ -475,8 +277,8 @@ export default function BookingPage() {
                       transition={{ duration: 0.5 }}
                       className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border transition-colors ${
                         done ? 'bg-brand-green border-brand-green text-white'
-                          : active ? 'bg-brand-orange border-brand-orange text-white'
-                          : 'bg-white border-brand-grayMuted text-[#94A3B8]'
+                        : active ? 'bg-brand-orange border-brand-orange text-white'
+                        : 'bg-white border-brand-grayMuted text-[#94A3B8]'
                       }`}
                     >
                       {done ? '✓' : current}
@@ -496,11 +298,82 @@ export default function BookingPage() {
             </div>
 
             <AnimatePresence mode="wait">
-              {step === 1 && (
-                <motion.div key="subjects-step" {...stepSlide}>
-                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 1: Choose Subjects</h2>
-                  <p className="text-[#334155] text-sm mb-4">Pick one subject. Use search + category filters for speed.</p>
 
+              {step === 1 && (
+                <motion.div key="info-step" {...stepSlide}>
+                  <h2 className="text-brand-navy font-bold text-xl mb-4">Step 1: Your Details</h2>
+                  <div className="grid gap-4 max-w-lg">
+                    <div>
+                      <label htmlFor="fullName" className="block text-sm font-medium text-[#64748B] mb-1.5">Full Name *</label>
+                      <input
+                        id="fullName"
+                        type="text"
+                        value={info.name}
+                        onChange={e => { setInfo(p => ({ ...p, name: e.target.value })); if (errors.name) setErrors(p => ({ ...p, name: undefined })); }}
+                        placeholder="Your full name"
+                        className={`input-field ${errors.name ? 'border-red-500/60' : ''}`}
+                      />
+                      {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#64748B] mb-1.5">Phone Number *</label>
+                      <div className="flex gap-2">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setCountryOpen(o => !o)}
+                            className="h-[46px] px-3 flex items-center gap-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm font-medium text-[#1B2A44] hover:border-[#CBD5E1] transition-colors whitespace-nowrap"
+                          >
+                            <span className="text-[10px] font-bold text-[#64748B] tracking-wide">{selectedCountry.abbr}</span>
+                            <span>{selectedCountry.code}</span>
+                            <svg className="w-3.5 h-3.5 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          <AnimatePresence>
+                            {countryOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                                className="absolute top-full mt-1 left-0 z-50 bg-white border border-[#E2E8F0] rounded-xl shadow-lg overflow-y-auto max-h-52 min-w-[190px]"
+                              >
+                                {COUNTRIES.map(c => (
+                                  <button
+                                    key={c.code}
+                                    type="button"
+                                    onClick={() => { setCountryCode(c.code); setCountryOpen(false); }}
+                                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left hover:bg-[#F8FAFC] transition-colors ${c.code === countryCode ? 'text-brand-orange font-medium bg-brand-orange/5' : 'text-[#334155]'}`}
+                                  >
+                                    <span className="text-[10px] font-bold text-[#64748B] w-6 tracking-wide">{c.abbr}</span>
+                                    <span className="font-medium">{c.code}</span>
+                                    <span className="text-[#64748B] text-xs">{c.name}</span>
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                        <input
+                          type="tel"
+                          value={info.phone}
+                          onChange={e => { setInfo(p => ({ ...p, phone: e.target.value })); if (errors.phone) setErrors(p => ({ ...p, phone: undefined })); }}
+                          placeholder="01012345678"
+                          className={`input-field flex-1 ${errors.phone ? 'border-red-500/60' : ''}`}
+                        />
+                      </div>
+                      {errors.phone && <p className="text-red-400 text-xs mt-1.5">{errors.phone}</p>}
+                      <p className="text-[#94A3B8] text-xs mt-1.5">{selectedCountry.name} ({selectedCountry.code}) — auto-detected from number</p>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-end">
+                    <button onClick={() => validateInfo() && setStep(2)} className="btn-primary px-8 py-3 text-sm">Continue</button>
+                  </div>
+                </motion.div>
+              )}
+
+              {step === 2 && (
+                <motion.div key="subjects-step" {...stepSlide}>
+                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Choose Subjects</h2>
+                  <p className="text-[#334155] text-sm mb-4">Pick one subject. Use search + category filters for speed.</p>
                   <input
                     type="text"
                     value={search}
@@ -508,50 +381,47 @@ export default function BookingPage() {
                     placeholder="Search subjects quickly..."
                     className="input-field mb-3"
                   />
-
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {categories.map(category => (
+                    {categories.map(cat => (
                       <button
-                        key={category}
-                        onClick={() => setActiveCategory(category)}
+                        key={cat}
+                        onClick={() => setActiveCategory(cat)}
                         className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
-                          activeCategory === category
+                          activeCategory === cat
                             ? 'bg-brand-orange text-white border-brand-orange'
                             : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-brand-orange/40'
                         }`}
                       >
-                        {category}
+                        {cat}
                       </button>
                     ))}
                   </div>
-
                   {selectedCount > 0 && (
                     <div className="mb-3 flex flex-wrap gap-2">
-                      {selectedSubjects.map(subject => (
-                        <span key={subject.subject} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-brand-orange/10 text-brand-navy border border-brand-orange/20">
-                          {subject.emoji} {subject.subject}
+                      {selectedSubjects.map(s => (
+                        <span key={s.subject} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-brand-orange/10 text-brand-navy border border-brand-orange/20">
+                          {s.emoji} {s.subject}
                         </span>
                       ))}
                     </div>
                   )}
-
                   <div className="max-h-[360px] overflow-y-auto pr-1 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {subjectsLoading ? (
                       <p className="text-sm text-[#64748B]">Loading subjects...</p>
                     ) : (
                       filteredSubjects.map(subject => {
-                        const active = selectedSubjects.some(item => item.subject === subject.name);
+                        const isActive = selectedSubjects.some(i => i.subject === subject.name);
                         return (
                           <button
                             key={subject.id}
                             onClick={() => toggleSubject(subject)}
                             className={`rounded-xl border p-4 text-left transition-all relative ${
-                              active
+                              isActive
                                 ? 'bg-white border-brand-orange ring-2 ring-brand-orange/30 shadow-[0_4px_16px_rgba(242,116,5,0.22)]'
                                 : 'bg-white border-brand-grayMuted hover:border-brand-orange/40'
                             }`}
                           >
-                            {active && (
+                            {isActive && (
                               <span className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-brand-orange text-white text-[10px] flex items-center justify-center font-bold">✓</span>
                             )}
                             <span className="text-2xl block mb-2">{subject.emoji}</span>
@@ -562,14 +432,13 @@ export default function BookingPage() {
                       })
                     )}
                   </div>
-
                   {!subjectsLoading && filteredSubjects.length === 0 && (
                     <p className="text-sm text-[#64748B] mt-2">No subjects match that search.</p>
                   )}
-
-                  <div className="mt-6 flex justify-end">
+                  <div className="mt-6 flex gap-3">
+                    <button onClick={() => setStep(1)} className="btn-ghost px-6 py-3 text-sm">Back</button>
                     <button
-                      onClick={() => selectedCount > 0 && setStep(2)}
+                      onClick={() => selectedCount > 0 && setStep(3)}
                       disabled={selectedCount === 0}
                       className="btn-primary px-8 py-3 text-sm disabled:opacity-40"
                     >
@@ -579,56 +448,46 @@ export default function BookingPage() {
                 </motion.div>
               )}
 
-              {step === 2 && (
+              {step === 3 && (
                 <motion.div key="setup-step" {...stepSlide}>
-                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 2: Setup Each Subject</h2>
+                  <h2 className="text-brand-navy font-bold text-xl mb-2">Step 3: Setup Each Subject</h2>
                   <p className="text-[#334155] text-sm mb-6">Set level, exam type, and exam session for each selected subject.</p>
-
                   <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
                     {selectedSubjects.map(subject => (
                       <div key={subject.subject} className="rounded-xl border border-brand-grayMuted bg-white p-4">
                         <p className="text-brand-navy font-semibold mb-3">{subject.emoji} {subject.subject}</p>
-
                         <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Level</p>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                          {LEVEL_OPTIONS.map(level => {
-                            const active = subject.level === level;
-                            return (
-                              <button
-                                key={level}
-                                onClick={() => updateSubjectSelection(subject.subject, { level })}
-                                className={`rounded-lg border px-2 py-2.5 text-sm font-semibold transition-all ${
-                                  active
-                                    ? 'bg-brand-orange text-white border-brand-orange shadow-md'
-                                    : 'text-brand-navy border-brand-grayMuted hover:border-brand-orange/50'
-                                }`}
-                              >
-                                {level}
-                              </button>
-                            );
-                          })}
+                          {LEVEL_OPTIONS.map(level => (
+                            <button
+                              key={level}
+                              onClick={() => updateSubjectSelection(subject.subject, { level })}
+                              className={`rounded-lg border px-2 py-2.5 text-sm font-semibold transition-all ${
+                                subject.level === level
+                                  ? 'bg-brand-orange text-white border-brand-orange shadow-md'
+                                  : 'text-brand-navy border-brand-grayMuted hover:border-brand-orange/50'
+                              }`}
+                            >
+                              {level}
+                            </button>
+                          ))}
                         </div>
-
                         <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Type</p>
                         <div className="grid grid-cols-2 gap-2 mb-4">
-                          {EXAM_TYPES.map(examType => {
-                            const active = subject.examType === examType;
-                            return (
-                              <button
-                                key={examType}
-                                onClick={() => updateSubjectSelection(subject.subject, { examType })}
-                                className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
-                                  active
-                                    ? 'bg-brand-orange text-white border-brand-orange shadow-md'
-                                    : 'text-brand-navy border-brand-grayMuted hover:border-brand-orange/50'
-                                }`}
-                              >
-                                {examType}
-                              </button>
-                            );
-                          })}
+                          {EXAM_TYPES.map(examType => (
+                            <button
+                              key={examType}
+                              onClick={() => updateSubjectSelection(subject.subject, { examType })}
+                              className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
+                                subject.examType === examType
+                                  ? 'bg-brand-orange text-white border-brand-orange shadow-md'
+                                  : 'text-brand-navy border-brand-grayMuted hover:border-brand-orange/50'
+                              }`}
+                            >
+                              {examType}
+                            </button>
+                          ))}
                         </div>
-
                         <p className="text-xs text-[#64748B] font-medium uppercase tracking-wider mb-2">Exam Session</p>
                         <select
                           value={subject.examSession}
@@ -638,18 +497,17 @@ export default function BookingPage() {
                           className="input-field"
                         >
                           <option value="">Select exam session</option>
-                          {EXAM_SESSIONS.map(examSession => (
-                            <option key={examSession} value={examSession}>{examSession}</option>
+                          {EXAM_SESSIONS.map(es => (
+                            <option key={es} value={es}>{es}</option>
                           ))}
                         </select>
                       </div>
                     ))}
                   </div>
-
                   <div className="mt-6 flex gap-3">
-                    <button onClick={() => setStep(1)} className="btn-ghost px-6 py-3 text-sm">Back</button>
+                    <button onClick={() => setStep(2)} className="btn-ghost px-6 py-3 text-sm">Back</button>
                     <button
-                      onClick={() => configuredAll && setStep(3)}
+                      onClick={() => configuredAll && setStep(4)}
                       disabled={!configuredAll}
                       className="btn-primary px-6 py-3 text-sm disabled:opacity-40"
                     >
@@ -659,73 +517,31 @@ export default function BookingPage() {
                 </motion.div>
               )}
 
-              {step === 3 && (
-                <motion.div key="info-step" {...stepSlide}>
-                  <h2 className="text-brand-navy font-bold text-xl mb-4">Step 3: Your Details</h2>
-
-                  {loggedInUser ? (
-                    <div className="rounded-xl border border-brand-grayMuted bg-white p-4">
-                      <p className="text-sm text-[#334155] mb-2">You are already signed in. We will use your saved details.</p>
-                      <p className="text-sm text-brand-navy font-medium">{loggedInUser.name} · {loggedInUser.email}{loggedInUser.phone ? ` · ${loggedInUser.phone}` : ''}</p>
-                    </div>
-                  ) : (
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <LabeledInput id="fullName" type="text" label="Full Name *" value={info.name} hasError={!!errors.name}
-                          onChange={value => { setInfo(prev => ({ ...prev, name: value })); if (errors.name) setErrors(prev => ({ ...prev, name: undefined })); }} />
-                        {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
-                      </div>
-                      <div>
-                        <LabeledInput id="email" type="email" label="Email Address *" value={info.email} hasError={!!errors.email}
-                          onChange={value => { setInfo(prev => ({ ...prev, email: value })); if (errors.email) setErrors(prev => ({ ...prev, email: undefined })); }} />
-                        {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
-                      </div>
-                      <div className="sm:col-span-2">
-                        <LabeledInput id="phone" type="tel" label="WhatsApp Number with Country Code *" value={info.phone} hasError={!!errors.phone}
-                          onChange={value => { setInfo(prev => ({ ...prev, phone: value })); if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined })); }} />
-                        {errors.phone && <p className="text-red-400 text-xs mt-1.5">{errors.phone}</p>}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="mt-6 flex gap-3">
-                    <button onClick={() => setStep(2)} className="btn-ghost px-6 py-3 text-sm">Back</button>
-                    <button onClick={() => (loggedInUser || validateInfo()) && setStep(4)} className="btn-primary px-6 py-3 text-sm">Continue</button>
-                  </div>
-                </motion.div>
-              )}
-
               {step === 4 && (
                 <motion.div key="review-step" {...stepSlide}>
-                  <h2 className="text-brand-navy font-bold text-xl mb-4">Step 4: Review & Submit</h2>
+                  <h2 className="text-brand-navy font-bold text-xl mb-4">Step 4: Review &amp; Submit</h2>
                   <div className="rounded-xl border border-brand-grayMuted bg-white p-5 mb-5 text-sm">
                     <div className="flex justify-between py-2 border-b border-brand-grayMuted">
                       <span className="text-[#334155]">Name</span>
-                      <span className="text-brand-navy font-semibold">{loggedInUser?.name ?? info.name}</span>
+                      <span className="text-brand-navy font-semibold">{info.name}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-brand-grayMuted">
-                      <span className="text-[#334155]">Email</span>
-                      <span className="text-brand-navy font-semibold">{loggedInUser?.email ?? info.email}</span>
+                      <span className="text-[#334155]">Phone</span>
+                      <span className="text-brand-navy font-semibold">{countryCode} {info.phone}</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-brand-grayMuted">
-                      <span className="text-[#334155]">WhatsApp</span>
-                      <span className="text-brand-navy font-semibold">{loggedInUser?.phone ?? info.phone}</span>
-                    </div>
-                    {selectedSubjects.map((subject, index) => (
-                      <div key={subject.subject} className={`py-2 ${index < selectedSubjects.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
+                    {selectedSubjects.map((s, i) => (
+                      <div key={s.subject} className={`py-2 ${i < selectedSubjects.length - 1 ? 'border-b border-brand-grayMuted' : ''}`}>
                         <div className="flex justify-between">
-                          <span className="text-[#334155]">{subject.emoji} {subject.subject}</span>
-                          <span className="text-brand-navy font-semibold">{subject.level}</span>
+                          <span className="text-[#334155]">{s.emoji} {s.subject}</span>
+                          <span className="text-brand-navy font-semibold">{s.level}</span>
                         </div>
                         <div className="flex justify-end mt-0.5">
-                          <span className="text-xs text-[#64748B]">{subject.examType} • {subject.examSession}</span>
+                          <span className="text-xs text-[#64748B]">{s.examType} • {s.examSession}</span>
                         </div>
                       </div>
                     ))}
                   </div>
-
                   {apiError && <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{apiError}</p>}
-
                   <div className="flex gap-3">
                     <button onClick={() => setStep(3)} className="btn-ghost px-6 py-3 text-sm">Back</button>
                     <button onClick={submitBooking} disabled={loading} className="btn-primary px-6 py-3 text-sm">
@@ -734,6 +550,7 @@ export default function BookingPage() {
                   </div>
                 </motion.div>
               )}
+
             </AnimatePresence>
           </div>
         </div>
