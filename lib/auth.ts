@@ -29,7 +29,7 @@ export interface AppUser {
   password: string;
   role: UserRole; 
   avatar?: string;
-}
+} 
 
 export interface SessionEntry {
   id: string;
