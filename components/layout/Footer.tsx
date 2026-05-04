@@ -10,10 +10,7 @@ const FOOTER_LINKS = {
     { label: 'Booking',  href: '/booking' },
   ],
   Support: [
-    { label: 'Contact',   href: '/contact' },
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Login',     href: '/auth' },
-    { label: 'Sign Up',   href: '/auth?tab=signup' },
+    { label: 'Contact', href: '/contact' },
   ],
 };
 

@@ -17,8 +17,8 @@ const Testimonials = dynamic(() => import('@/components/home/Testimonials'), {
 });
 
 export const metadata = {
-  title: 'Expert IGCSE Tutoring | El7a2ny Tutoring',
-  description: 'El7a2ny offers expert, personalised IGCSE tutoring across all core subjects. Achieve top grades with our proven tutors.',
+  title: 'Expert Tutoring for IGCSE, IB, American & More | El7a2ny',
+  description: 'El7a2ny offers expert, personalised tutoring for IGCSE, IB, American Diploma, National Systems, University Subjects, and Project Assistance. Achieve top grades with our proven tutors.'
 };
 
 export default function HomePage() {

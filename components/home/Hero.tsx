@@ -80,7 +80,7 @@ export default function Hero() {
           <div className="rounded-2xl bg-white/95 border border-[#E2E8F0] shadow-[0_8px_24px_rgba(27,42,68,0.10)] px-4 py-3 text-left backdrop-blur-sm">
             <p className="text-[10px] uppercase tracking-[0.18em] text-[#94A3B8] font-semibold">Families Trust Us</p>
             <p className="text-2xl font-extrabold text-[#1B2A44] mt-1">500+</p>
-            <p className="text-xs text-[#64748B]">IGCSE students enrolled</p>
+            <p className="text-xs text-[#64748B]">students enrolled</p>
           </div>
         </motion.div>
 
@@ -104,7 +104,7 @@ export default function Hero() {
         >
           <span className="text-[#1B2A44]">A Better System for</span>
           <br />
-          <span className="gradient-text">Faster IGCSE Results</span>
+          <span className="gradient-text">Faster Academic Results</span>
         </motion.h1>
 
         {/* Subheading */}

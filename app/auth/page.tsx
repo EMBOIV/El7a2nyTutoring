@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   getRoleForEmail,
   getUsers,
@@ -167,8 +168,24 @@ function SignupFormComp({ onSuccess }: { onSuccess: (name: string, email: string
 }
 
 export default function AuthPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>('login');
   const [successUser, setSuccessUser] = useState<{ name: string; email: string } | null>(null);
+
+  // Redirect to home if already logged in
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('el7a2ny_session');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.name && parsed?.email) {
+          router.replace('/');
+        }
+      }
+    } catch {
+      // Invalid session — ignore
+    }
+  }, [router]);
 
   const handleSuccess = (name: string, email: string) => setSuccessUser({ name, email });
 
